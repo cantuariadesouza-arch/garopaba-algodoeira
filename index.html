@@ -127,6 +127,8 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:600;min-height:44px;d
 #gate button{width:100%;min-height:48px;margin-top:16px;border-radius:12px;border:0;background:#19c3a3;color:#04221b;font:600 16px Inter;cursor:pointer}
 #gate button.link{background:none;color:#7fe3cc;margin-top:8px;min-height:40px;font-weight:500}
 #gate .err{color:#ff9a80;font-size:14px;margin-top:10px;min-height:18px}
+#gate button.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1f1f1f;font-weight:500;margin-top:4px}
+#gate .gor{display:flex;align-items:center;gap:10px;color:#a9c2b8;font-size:13px;margin:14px 0 2px}#gate .gor::before,#gate .gor::after{content:"";flex:1;height:1px;background:#ffffff26}
 .who{display:flex;align-items:center;gap:8px;font:400 13px Inter;color:#9fb8ae;margin-left:auto}.who b{color:#eef4ef;font-weight:600}
 .who button{min-height:34px;padding:0 10px;font-size:13px;background:#ffffff14;border:1px solid #ffffff26;color:#eef4ef;border-radius:10px}
 @media(max-width:600px){.who span{display:none}}
@@ -140,17 +142,24 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:600;min-height:44px;d
   <svg width="40" height="40" viewBox="0 0 26 26" aria-hidden="true"><circle cx="9" cy="10" r="6" fill="#eef4ef"/><circle cx="17" cy="10" r="6" fill="#dfe9e3"/><circle cx="13" cy="16" r="6" fill="#fff"/><path d="M13 21v4" stroke="#19c3a3" stroke-width="2"/></svg>
   <div id="g-load"><h1>Garopaba Algodoeira</h1><p>Carregando…</p></div>
   <form id="g-login" hidden><h1>Garopaba Algodoeira</h1><p>Entre com seu e-mail da empresa.</p>
+   <button type="button" class="gbtn" data-google><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Entrar com Google</button><div class="gor">ou</div>
    <label for="gl-e">E-mail</label><input id="gl-e" type="email" autocomplete="email" required>
    <label for="gl-s">Senha</label><input id="gl-s" type="password" autocomplete="current-password" required>
    <button type="submit">Entrar</button><button type="button" class="link" data-go="cad">Não tenho cadastro</button><button type="button" class="link" id="gl-r">Esqueci a senha</button>
    <div class="err" id="gl-m"></div></form>
   <form id="g-cad" hidden><h1>Criar cadastro</h1><p>Depois do cadastro, o administrador libera seu acesso.</p>
+   <button type="button" class="gbtn" data-google><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Cadastrar com Google</button><div class="gor">ou</div>
    <label for="gc-n">Nome completo</label><input id="gc-n" required autocomplete="name">
    <label for="gc-d">Departamento</label><select id="gc-d" required><option value="">Escolha…</option></select>
    <label for="gc-e">E-mail</label><input id="gc-e" type="email" required autocomplete="email">
    <label for="gc-s">Senha (mínimo 6 caracteres)</label><input id="gc-s" type="password" minlength="6" required autocomplete="new-password">
    <button type="submit">Cadastrar</button><button type="button" class="link" data-go="login">Já tenho cadastro</button>
    <div class="err" id="gc-m"></div></form>
+  <form id="g-comp" hidden><h1>Complete seu cadastro</h1><p>Falta só confirmar seu nome e escolher o departamento.</p>
+   <label for="gp-n">Nome completo</label><input id="gp-n" required autocomplete="name">
+   <label for="gp-d">Departamento</label><select id="gp-d" required><option value="">Escolha…</option></select>
+   <button type="submit">Continuar</button><button type="button" class="link" id="gp-o">Sair</button>
+   <div class="err" id="gp-m"></div></form>
   <div id="g-wait" hidden><h1>Aguardando liberação</h1><p id="gw-t">Seu cadastro foi recebido. Assim que o administrador liberar, o app abre aqui.</p><button type="button" id="gw-r">Verificar de novo</button><button type="button" class="link" id="gw-o">Sair</button></div>
   <div id="g-cfg" hidden><h1>Quase pronto</h1><p>O app ainda não foi ligado ao banco de dados (config.js sem os dados do Supabase).</p></div>
  </div>
@@ -164,14 +173,15 @@ window.DEPTOS=['Comercial','Financeiro','Contábil','Faturamento','Logística','
 const C=window.GAROPABA_CONFIG||{},g=id=>document.getElementById(id);
 let ready,readyRes;ready=new Promise(r=>readyRes=r);
 window.GP={sb:null,user:null,perfil:null,ready};
-g('gc-d').innerHTML+=DEPTOS.map(d=>`<option>${d}</option>`).join('');
-const show=id=>['g-load','g-login','g-cad','g-wait','g-cfg'].forEach(x=>g(x).hidden=x!==id);
+g('gc-d').innerHTML+=DEPTOS.map(d=>`<option>${d}</option>`).join('');g('gp-d').innerHTML+=DEPTOS.map(d=>`<option>${d}</option>`).join('');
+const show=id=>['g-load','g-login','g-cad','g-comp','g-wait','g-cfg'].forEach(x=>g(x).hidden=x!==id);
 document.querySelectorAll('#gate [data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go==='cad'?'g-cad':'g-login'));
 if(!C.SUPABASE_URL||!C.SUPABASE_KEY||!window.supabase){show('g-cfg');return}
 const sb=window.supabase.createClient(C.SUPABASE_URL,C.SUPABASE_KEY);GP.sb=sb;
 const msg=e=>{const m=(e&&e.message)||'';if(/Invalid login/i.test(m))return'E-mail ou senha incorretos.';if(/already registered/i.test(m))return'Este e-mail já tem cadastro. Use "Já tenho cadastro".';if(/Email not confirmed/i.test(m))return'Confirme seu e-mail pelo link que enviamos e depois entre.';if(/Password/i.test(m))return'A senha precisa ter pelo menos 6 caracteres.';return'Não deu certo: '+m};
 async function check(){const {data:{session}}=await sb.auth.getSession();if(!session){show('g-login');return}
  GP.user=session.user;const {data:p}=await sb.from('perfis').select('*').eq('id',session.user.id).maybeSingle();GP.perfil=p;
+ if(p&&p.depto_ok===false){g('gp-n').value=p.nome||'';g('gp-m').textContent='';show('g-comp');return}
  if(!p||p.status!=='ativo'){g('gw-t').textContent=p&&p.status==='bloqueado'?'Seu acesso está bloqueado. Fale com o administrador.':'Olá'+(p?', '+p.nome.split(' ')[0]:'')+'! Seu cadastro'+(p?' ('+p.departamento+')':'')+' foi recebido. Assim que o administrador liberar, o app abre aqui.';show('g-wait');return}
  g('gate').hidden=true;readyRes(true);document.dispatchEvent(new CustomEvent('gp-ready'))}
 g('g-login').onsubmit=async e=>{e.preventDefault();g('gl-m').textContent='Entrando…';const {error}=await sb.auth.signInWithPassword({email:g('gl-e').value.trim(),password:g('gl-s').value});if(error){g('gl-m').textContent=msg(error);return}g('gl-m').textContent='';check()};
@@ -179,8 +189,11 @@ g('gl-r').onclick=async()=>{const e=g('gl-e').value.trim();if(!e){g('gl-m').text
 g('g-cad').onsubmit=async e=>{e.preventDefault();const d=g('gc-d').value;if(!d){g('gc-m').textContent='Escolha o departamento.';return}g('gc-m').textContent='Cadastrando…';
  const {data,error}=await sb.auth.signUp({email:g('gc-e').value.trim(),password:g('gc-s').value,options:{data:{nome:g('gc-n').value.trim(),departamento:d},emailRedirectTo:location.origin+location.pathname}});
  if(error){g('gc-m').textContent=msg(error);return}if(!data.session){g('gc-m').textContent='Cadastro feito! Abra o e-mail que enviamos para confirmar e depois entre.';return}g('gc-m').textContent='';check()};
+document.querySelectorAll('#gate [data-google]').forEach(b=>b.onclick=async()=>{const m=b.closest('form').querySelector('.err');m.textContent='Abrindo o Google…';const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname,queryParams:{prompt:'select_account'}}});if(error)m.textContent=/not enabled|provider/i.test(error.message||'')?'O login com Google ainda não foi ativado.':msg(error)});
+g('g-comp').onsubmit=async e=>{e.preventDefault();const d=g('gp-d').value;if(!d){g('gp-m').textContent='Escolha o departamento.';return}g('gp-m').textContent='Salvando…';const {error}=await sb.rpc('completar_cadastro',{p_nome:g('gp-n').value.trim(),p_depto:d});if(error){g('gp-m').textContent=msg(error);return}check()};
+g('gp-o').onclick=async()=>{await sb.auth.signOut();location.reload()};
 g('gw-r').onclick=check;g('gw-o').onclick=async()=>{await sb.auth.signOut();location.reload()};
-sb.auth.onAuthStateChange((ev)=>{if(ev==='PASSWORD_RECOVERY'){const n=prompt('Digite a nova senha (mínimo 6 caracteres):');if(n)sb.auth.updateUser({password:n}).then(({error})=>alert(error?msg(error):'Senha alterada.'))}});
+sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_IN'&&/access_token|code=/.test(location.hash+location.search)){history.replaceState(null,'',location.pathname);check()}if(ev==='PASSWORD_RECOVERY'){const n=prompt('Digite a nova senha (mínimo 6 caracteres):');if(n)sb.auth.updateUser({password:n}).then(({error})=>alert(error?msg(error):'Senha alterada.'))}});
 check();
 
 /* ponte: mesma interface que o app usava (db, user) */
