@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garopaba Algodoeira</title>
+<meta name="theme-color" content="#0c241d">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: mesa de operações calma e precisa — números primeiro, nada de enfeite.
+   IDEA: um terminal de cotações de pluma, como o painel de uma trading.
+   PICTURE: faixa verde-escura com o Indicador ESALQ grande e a curva de preço brilhando sobre uma grade fina.
+   COLOUR and TYPE: verde-campo profundo, branco-algodão, acento turquesa; Sora nos números, Inter no texto.
+   LAYOUT: abas no rodapé (app), mercado → notícias → calculadoras; uma coluna no celular. */
+:root{color-scheme:light dark;
+--bg:light-dark(#f5f4ef,#0a1411);--ink:light-dark(#0f1f1a,#e8eee9);--mut:light-dark(#5b6b65,#93a49d);
+--card:light-dark(#ffffff,#111f1a);--line:light-dark(#e1e4dc,#20332c);--field:#0c241d;--field2:#103229;
+--acc:#19c3a3;--up:light-dark(#0f8a6c,#2fd3a8);--dn:light-dark(#c8442a,#ff7a5c);--in:light-dark(#f2f3ee,#0d1915)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip;padding-bottom:84px}
+h1,h2,h3,.num{font-family:Sora,Inter,sans-serif}
+h2{font-size:24px;line-height:1.15;margin:0 0 4px;text-wrap:balance}
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(4vw,16px)}
+.band{padding-block:clamp(22px,4vw,48px)}
+header.top{background:var(--field);color:#eef4ef;padding:14px 0 0}
+.brand{display:flex;align-items:center;gap:10px;font:600 16px Sora,sans-serif;letter-spacing:.2px}
+.brand small{font:400 13px Inter;color:#9fb8ae;margin-left:auto}
+.rf{min-height:38px;padding:0 14px;font-size:14px;font-weight:600;background:#19c3a3;border-color:#19c3a3;color:#04221b;margin-left:12px;white-space:nowrap}.rf[disabled]{opacity:.6;cursor:wait}
+.nota{font-size:13px;color:#cfe0d8;padding-top:8px}
+@media(max-width:600px){.rf{margin-left:auto}}
+.hero{background:radial-gradient(120% 90% at 85% 0%,#164a3b 0%,var(--field) 55%);color:#eef4ef;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#ffffff0a 1px,transparent 1px),linear-gradient(90deg,#ffffff0a 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.hgrid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:28px;align-items:end}
+.lbl{font-size:13px;color:#9fb8ae}
+.big{font:700 clamp(48px,9vw,84px)/1 Sora,sans-serif;letter-spacing:-1.5px;margin:6px 0}
+.big span{font-size:.32em;font-weight:400;color:#9fb8ae;letter-spacing:0;margin-left:6px}
+.chip{display:inline-flex;gap:4px;align-items:center;font:600 13px Inter;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.chip.up{background:#2fd3a826;color:#5fe8c2}.chip.dn{background:#ff7a5c26;color:#ff9a80}.chip.eq{background:#ffffff1a;color:#cfdcd6}
+.conv{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.conv div{background:#ffffff0d;border:1px solid #ffffff1a;border-radius:14px;padding:10px 12px}
+.conv b{display:block;font:600 20px Sora,Inter,sans-serif;white-space:nowrap}
+.fig{position:relative;min-height:300px}.fig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:-34px;position:relative}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:0 10px 30px -18px #0c241d55}
+.kpi .v{font:700 30px Sora,Inter,sans-serif;white-space:nowrap}.kpi .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.kpi .chip.up{background:light-dark(#0f8a6c18,#2fd3a826);color:var(--up)}.kpi .chip.dn{background:light-dark(#c8442a18,#ff7a5c26);color:var(--dn)}.kpi .chip.eq{background:var(--in);color:var(--mut)}
+.kpi .fig{min-height:56px;margin-top:6px}
+.kpis.bolsas{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:12px}
+.sub{font-size:14px;color:var(--mut);margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}.sub b{color:var(--ink);font-weight:600}.sub div{display:flex;justify-content:space-between;gap:8px;padding:2px 0}.sub div b{white-space:nowrap}
+@media(max-width:860px){.kpis.bolsas{grid-template-columns:minmax(0,1fr)}}
+.mut{color:var(--mut);font-size:14px}
+.cols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;margin-top:18px}
+table{width:100%;border-collapse:collapse;font-size:15px}th,td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}th{font-weight:500;color:var(--mut);font-size:13px}
+.scroll{overflow-x:auto}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:light-dark(#ffffffee,#0d1a16ee);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+nav.tabs a{flex:1;max-width:200px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px;min-height:52px;color:var(--mut);text-decoration:none;font-size:13px;font-weight:500;border-radius:12px}
+nav.tabs a.on{color:var(--ink);background:var(--in)}nav.tabs a.on svg{stroke:var(--acc)}
+nav.tabs svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+section.view{display:none}section.view.on{display:block}
+.filters,.seg{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+button,.btn{font:500 15px Inter;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.on{background:var(--field);color:#eef4ef;border-color:var(--field)}
+button.pri{background:var(--acc);border-color:var(--acc);color:#04221b;font-weight:600}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.news{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.news a{color:inherit;text-decoration:none}.news h3{font-size:18px;line-height:1.3;margin:8px 0 6px;font-weight:600}
+.news .card:hover h3{text-decoration:underline}
+.tag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--in);color:var(--acc)}
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f{display:flex;flex-direction:column;gap:4px}.f.w{grid-column:1/-1}
+.f.mini{flex-direction:row}.f.mini button{flex:1}
+.f label{font-size:13px;color:var(--mut);font-weight:500}
+input,select{font:16px Inter;min-height:46px;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:var(--in);color:var(--ink);width:100%}
+.res{background:var(--field);color:#eef4ef;border-color:var(--field);position:sticky;top:12px}
+.res .big{font-size:clamp(36px,6vw,56px)}
+.res table td,.res table th{border-color:#ffffff1f;color:#eef4ef}.res td:first-child{color:#a9c2b8}
+.neg{color:#ff9a80!important}.pos{color:#5fe8c2!important}
+.mini{display:flex;flex-wrap:wrap;gap:8px}.mini button{min-height:36px;font-size:13px;padding:0 12px}
+details{margin-top:18px}summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
+.msg{font-size:14px;margin-top:8px}
+.note{font-size:13px;color:var(--mut);margin-top:10px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.tile{aspect-ratio:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;padding:18px;border-radius:20px;background:var(--card);border:1px solid var(--line);color:var(--ink);text-decoration:none;position:relative;overflow:hidden;box-shadow:0 10px 30px -18px #0c241d55;transition:transform .15s,border-color .15s}
+.tile:hover,.tile:active{border-color:var(--acc);transform:translateY(-2px)}
+.tile i{position:absolute;top:16px;left:16px;width:48px;height:48px;border-radius:14px;background:var(--field);display:grid;place-items:center}
+.tile i svg{width:26px;height:26px;fill:none;stroke:#3fe0bd;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tile b{font:600 17px/1.2 Sora,sans-serif}.tile span{font-size:13px;color:var(--mut);line-height:1.35}
+.back{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:12px;background:var(--in);color:var(--ink);text-decoration:none;font-weight:500;margin-bottom:10px}
+#cbar h2{margin-bottom:14px}
+@media(max-width:860px){.tiles,.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:380px){.tile{padding:14px}.tile b{font-size:15px}.tile i{width:40px;height:40px}}
+.xr{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #ffffff1f}.xr b{display:block;font-weight:600;white-space:nowrap}.xr span{display:block;font-size:13px;color:#a9c2b8}.xr div:last-child{text-align:right}
+.prow{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr) minmax(0,1.2fr) auto;gap:8px;align-items:end;padding:12px 0;border-bottom:1px solid var(--line)}
+.prow .x{min-height:46px;padding:0 12px}
+@media(max-width:600px){.prow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.prow .x{grid-column:2}}
+@media(max-width:860px){.hgrid,.cols,.calc{grid-template-columns:minmax(0,1fr)}.res{position:static;order:-1}.fig.hero-fig{min-height:240px}}
+@media(max-width:600px){.kpis{grid-template-columns:minmax(0,1fr);margin-top:-24px}.form{grid-template-columns:1fr}.brand small{display:none}table{font-size:13px}}
+#d-t td:first-child,#d-f td:first-child{white-space:normal}#d-t td:last-child,#d-f td:last-child{padding-left:10px}
+.dnav{display:flex;align-items:center;gap:8px;margin:18px 0 4px;flex-wrap:wrap}.dnav button{min-width:48px;font-size:24px;line-height:1;padding:0 12px}.dnav button.hoje{font-size:15px}.dnav button:disabled{opacity:.35;cursor:default}
+.dlbl{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:52px;flex:1;max-width:260px;padding:4px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);cursor:pointer;font:600 19px Sora,Inter,sans-serif}.dlbl span{display:flex;flex-direction:column;align-items:center;line-height:1.2}.dlbl small{display:block;font:500 12px Inter;color:var(--mut)}.dnav{flex-wrap:nowrap}.dnav button.hoje{padding:0 10px;min-width:0}
+.dlbl input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;min-height:0;padding:0;border:0}
+.hbox{margin-top:18px}.hhead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}.hhead h3{font-size:20px;margin:0}
+.hfil{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:10px;align-items:end;margin:14px 0 6px}
+@media(max-width:860px){.hfil{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hfil .f.t{grid-column:1/-1}}
+.hi{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.hi b{display:block;font-weight:600}.hi .mut{font-size:13px}.hi .r{text-align:right;flex-shrink:0}.hi .r b{white-space:nowrap}
+.hi .a{display:flex;gap:6px;justify-content:flex-end;margin-top:6px}.hi .a button{min-height:34px;font-size:13px;padding:0 10px}
+@media(max-width:600px){.hi{flex-direction:column;align-items:stretch}.hi .r{text-align:left}.hi .a{justify-content:flex-start}}
+@media(prefers-reduced-motion:no-preference){.pulse{animation:p 2.4s ease-in-out infinite}@keyframes p{50%{opacity:.35}}}
+</style>
+</head>
+<body>
+<style>
+#gate{position:fixed;inset:0;z-index:100;background:radial-gradient(120% 90% at 85% 0%,#164a3b 0%,#0c241d 60%);color:#eef4ef;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+#gate .box{width:100%;max-width:420px;background:#0f2a22;border:1px solid #ffffff1f;border-radius:20px;padding:24px}
+#gate h1{font:700 24px Sora,Inter,sans-serif;margin:8px 0 2px}#gate p{color:#a9c2b8;font-size:14px;margin:0 0 14px}
+#gate label{display:block;font-size:13px;color:#a9c2b8;margin:10px 0 4px}
+#gate input,#gate select{width:100%;min-height:46px;border-radius:12px;border:1px solid #ffffff26;background:#0a1d17;color:#eef4ef;padding:0 12px;font:16px Inter}
+#gate button{width:100%;min-height:48px;margin-top:16px;border-radius:12px;border:0;background:#19c3a3;color:#04221b;font:600 16px Inter;cursor:pointer}
+#gate button.link{background:none;color:#7fe3cc;margin-top:8px;min-height:40px;font-weight:500}
+#gate .err{color:#ff9a80;font-size:14px;margin-top:10px;min-height:18px}
+.who{display:flex;align-items:center;gap:8px;font:400 13px Inter;color:#9fb8ae;margin-left:auto}.who b{color:#eef4ef;font-weight:600}
+.who button{min-height:34px;padding:0 10px;font-size:13px;background:#ffffff14;border:1px solid #ffffff26;color:#eef4ef;border-radius:10px}
+@media(max-width:600px){.who span{display:none}}
+.eq{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.eq .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.eq .acts button{min-height:36px;font-size:13px;padding:0 10px}
+.eq select{min-height:38px}.badge{font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--in)}.badge.p{color:#e0a100}.badge.a{color:var(--up)}.badge.b{color:var(--dn)}
+@media(max-width:700px){.eq{grid-template-columns:minmax(0,1fr)}.eq .acts{justify-content:flex-start}}
+</style>
+<div id="gate">
+ <div class="box">
+  <svg width="40" height="40" viewBox="0 0 26 26" aria-hidden="true"><circle cx="9" cy="10" r="6" fill="#eef4ef"/><circle cx="17" cy="10" r="6" fill="#dfe9e3"/><circle cx="13" cy="16" r="6" fill="#fff"/><path d="M13 21v4" stroke="#19c3a3" stroke-width="2"/></svg>
+  <div id="g-load"><h1>Garopaba Algodoeira</h1><p>Carregando…</p></div>
+  <form id="g-login" hidden><h1>Garopaba Algodoeira</h1><p>Entre com seu e-mail da empresa.</p>
+   <label for="gl-e">E-mail</label><input id="gl-e" type="email" autocomplete="email" required>
+   <label for="gl-s">Senha</label><input id="gl-s" type="password" autocomplete="current-password" required>
+   <button type="submit">Entrar</button><button type="button" class="link" data-go="cad">Não tenho cadastro</button><button type="button" class="link" id="gl-r">Esqueci a senha</button>
+   <div class="err" id="gl-m"></div></form>
+  <form id="g-cad" hidden><h1>Criar cadastro</h1><p>Depois do cadastro, o administrador libera seu acesso.</p>
+   <label for="gc-n">Nome completo</label><input id="gc-n" required autocomplete="name">
+   <label for="gc-d">Departamento</label><select id="gc-d" required><option value="">Escolha…</option></select>
+   <label for="gc-e">E-mail</label><input id="gc-e" type="email" required autocomplete="email">
+   <label for="gc-s">Senha (mínimo 6 caracteres)</label><input id="gc-s" type="password" minlength="6" required autocomplete="new-password">
+   <button type="submit">Cadastrar</button><button type="button" class="link" data-go="login">Já tenho cadastro</button>
+   <div class="err" id="gc-m"></div></form>
+  <div id="g-wait" hidden><h1>Aguardando liberação</h1><p id="gw-t">Seu cadastro foi recebido. Assim que o administrador liberar, o app abre aqui.</p><button type="button" id="gw-r">Verificar de novo</button><button type="button" class="link" id="gw-o">Sair</button></div>
+  <div id="g-cfg" hidden><h1>Quase pronto</h1><p>O app ainda não foi ligado ao banco de dados (config.js sem os dados do Supabase).</p></div>
+ </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+/* ---- Garopaba: login, perfis e ponte de dados (Supabase) ---- */
+window.DEPTOS=['Comercial','Financeiro','Contábil','Faturamento','Logística','Jurídico'];
+(function(){
+const C=window.GAROPABA_CONFIG||{},g=id=>document.getElementById(id);
+let ready,readyRes;ready=new Promise(r=>readyRes=r);
+window.GP={sb:null,user:null,perfil:null,ready};
+g('gc-d').innerHTML+=DEPTOS.map(d=>`<option>${d}</option>`).join('');
+const show=id=>['g-load','g-login','g-cad','g-wait','g-cfg'].forEach(x=>g(x).hidden=x!==id);
+document.querySelectorAll('#gate [data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go==='cad'?'g-cad':'g-login'));
+if(!C.SUPABASE_URL||!C.SUPABASE_KEY||!window.supabase){show('g-cfg');return}
+const sb=window.supabase.createClient(C.SUPABASE_URL,C.SUPABASE_KEY);GP.sb=sb;
+const msg=e=>{const m=(e&&e.message)||'';if(/Invalid login/i.test(m))return'E-mail ou senha incorretos.';if(/already registered/i.test(m))return'Este e-mail já tem cadastro. Use "Já tenho cadastro".';if(/Email not confirmed/i.test(m))return'Confirme seu e-mail pelo link que enviamos e depois entre.';if(/Password/i.test(m))return'A senha precisa ter pelo menos 6 caracteres.';return'Não deu certo: '+m};
+async function check(){const {data:{session}}=await sb.auth.getSession();if(!session){show('g-login');return}
+ GP.user=session.user;const {data:p}=await sb.from('perfis').select('*').eq('id',session.user.id).maybeSingle();GP.perfil=p;
+ if(!p||p.status!=='ativo'){g('gw-t').textContent=p&&p.status==='bloqueado'?'Seu acesso está bloqueado. Fale com o administrador.':'Olá'+(p?', '+p.nome.split(' ')[0]:'')+'! Seu cadastro'+(p?' ('+p.departamento+')':'')+' foi recebido. Assim que o administrador liberar, o app abre aqui.';show('g-wait');return}
+ g('gate').hidden=true;readyRes(true);document.dispatchEvent(new CustomEvent('gp-ready'))}
+g('g-login').onsubmit=async e=>{e.preventDefault();g('gl-m').textContent='Entrando…';const {error}=await sb.auth.signInWithPassword({email:g('gl-e').value.trim(),password:g('gl-s').value});if(error){g('gl-m').textContent=msg(error);return}g('gl-m').textContent='';check()};
+g('gl-r').onclick=async()=>{const e=g('gl-e').value.trim();if(!e){g('gl-m').textContent='Digite seu e-mail acima e toque de novo em "Esqueci a senha".';return}const {error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin+location.pathname});g('gl-m').textContent=error?msg(error):'Enviamos um link para trocar a senha no seu e-mail.'};
+g('g-cad').onsubmit=async e=>{e.preventDefault();const d=g('gc-d').value;if(!d){g('gc-m').textContent='Escolha o departamento.';return}g('gc-m').textContent='Cadastrando…';
+ const {data,error}=await sb.auth.signUp({email:g('gc-e').value.trim(),password:g('gc-s').value,options:{data:{nome:g('gc-n').value.trim(),departamento:d},emailRedirectTo:location.origin+location.pathname}});
+ if(error){g('gc-m').textContent=msg(error);return}if(!data.session){g('gc-m').textContent='Cadastro feito! Abra o e-mail que enviamos para confirmar e depois entre.';return}g('gc-m').textContent='';check()};
+g('gw-r').onclick=check;g('gw-o').onclick=async()=>{await sb.auth.signOut();location.reload()};
+sb.auth.onAuthStateChange((ev)=>{if(ev==='PASSWORD_RECOVERY'){const n=prompt('Digite a nova senha (mínimo 6 caracteres):');if(n)sb.auth.updateUser({password:n}).then(({error})=>alert(error?msg(error):'Senha alterada.'))}});
+check();
+
+/* ponte: mesma interface que o app usava (db, user) */
+const docRef=path=>({
+ onSnapshot(next,err){let alive=true;const load=async()=>{const {data,error}=await sb.from('docs').select('data').eq('path',path).maybeSingle();if(!alive)return;if(error){err&&err(error);return}next({exists:!!data,data:()=>data?.data,metadata:{fromCache:false}})};
+  load();const ch=sb.channel('d-'+path+'-'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'docs',filter:'path=eq.'+path},load).subscribe();const t=setInterval(load,180000);
+  return()=>{alive=false;clearInterval(t);sb.removeChannel(ch)}},
+ async set(d){const {error}=await sb.from('docs').upsert({path,data:d,atualizado_em:new Date().toISOString()});if(error)throw{code:'invalid_argument',message:error.message}}});
+const fromRow=r=>({tipo:r.tipo,em:r.criado_em,ref:r.ref,titulo:r.titulo,res:r.res,sub:r.sub,inputs:r.inputs,por:r.criado_por,fidc:r.fidc,bruto:r.bruto==null?null:Number(r.bruto),nfs:r.nfs,depto:r.departamento});
+const histCol=(lim=1000)=>({orderBy(){return this},limit(n){lim=n;return this},
+ onSnapshot(next,err){let alive=true;const load=async()=>{const {data,error}=await sb.from('historico').select('*').order('criado_em',{ascending:false}).limit(lim);if(!alive)return;if(error){err&&err(error);return}next({docs:data.map(r=>({id:r.id,data:()=>fromRow(r)}))})};
+  load();GP.reloadHist=load;const ch=sb.channel('h-'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'historico'},load).subscribe();
+  return()=>{alive=false;sb.removeChannel(ch)}},
+ async add(d){const row={tipo:d.tipo,ref:d.ref||null,titulo:d.titulo,res:d.res,sub:d.sub,inputs:d.inputs,fidc:d.fidc??null,bruto:d.bruto??null,nfs:d.nfs??null};const {error}=await sb.from('historico').insert(row);if(error)throw{code:'permission_denied',message:error.message};GP.reloadHist&&GP.reloadHist()},
+ doc(id){return{async delete(){const {error}=await sb.from('historico').delete().eq('id',id);if(error)throw error;GP.reloadHist&&GP.reloadHist()}}}});
+const db={doc:docRef,collection:p=>p==='historico'?histCol():null};
+const user={async id(){return GP.user?.id||null},isOwner(){return GP.perfil?.papel==='admin'},canEdit(){return GP.perfil?.papel==='admin'},
+ async profiles(ids){const {data}=await sb.from('perfis').select('id,nome').in('id',ids);const o={};(data||[]).forEach(p=>o[p.id]={name:p.nome});return o}};
+window.claude={use:async n=>{await ready;return n==='db'?db:n==='user'?user:null}};
+})();
+if(!window.claude)window.claude={use:async()=>null};
+</script>
+
+<header class="top"><div class="wrap brand">
+<svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="9" cy="10" r="6" fill="#eef4ef"/><circle cx="17" cy="10" r="6" fill="#dfe9e3"/><circle cx="13" cy="16" r="6" fill="#fff"/><path d="M13 21v4" stroke="#19c3a3" stroke-width="2"/></svg>
+Garopaba Algodoeira<small id="upd">Carregando dados…</small><button type="button" id="rf" class="rf" hidden>↻ Atualizar</button><div class="who" id="who" hidden><span id="who-t"></span><button type="button" id="who-o">Sair</button></div></div><div class="wrap nota" id="nota" hidden></div><div class="wrap nota" id="rfm" role="status" hidden></div><div style="height:12px"></div></header>
+
+<section class="view" id="v-mercado">
+<div class="hero"><div class="wrap band hgrid">
+<div>
+<div class="lbl">Indicador do algodão em pluma CEPEA/ESALQ · 8 dias</div>
+<div class="big num" id="esq-v">—<span>¢R$/lp</span></div>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="chip eq" id="esq-c">—</span><span class="lbl" id="esq-d"></span></div>
+<div class="conv"><div><span class="lbl">Por arroba</span><b id="esq-a">—</b></div><div><span class="lbl">Em dólar (aprox.)</span><b id="esq-u">—</b></div></div>
+</div>
+<div class="fig hero-fig"><svg id="ch-esq" role="img" aria-label="Gráfico do Indicador ESALQ"></svg></div>
+</div></div>
+<div class="wrap">
+<div class="kpis">
+<div class="card kpi"><div class="row"><span class="mut">Algodão NY · ICE</span><span class="chip eq" id="ice-c">—</span></div><div class="v" id="ice-v">—</div><div class="mut" id="ice-d"></div><div class="fig"><svg id="ch-ice"></svg></div></div>
+<div class="card kpi"><div class="row"><span class="mut">Dólar · USD/BRL</span><span class="chip eq" id="usd-c">—</span></div><div class="v" id="usd-v">—</div><div class="mut" id="usd-d"></div><div class="sub" id="usd-x"></div><div class="fig"><svg id="ch-usd"></svg></div></div>
+<div class="card kpi"><div class="row"><span class="mut">Euro · EUR/BRL</span><span class="chip eq" id="eur-c">—</span></div><div class="v" id="eur-v">—</div><div class="mut" id="eur-d"></div><div class="sub" id="eur-x"></div><div class="fig"><svg id="ch-eur"></svg></div></div>
+<div class="card kpi"><div class="row"><span class="mut">Selic</span><span class="chip eq">Copom</span></div><div class="v" id="sel-v">—</div><div class="mut" id="sel-d">ao ano</div></div>
+</div>
+<h2 style="margin-top:26px">Bolsas</h2><p class="mut" style="margin:0">Índices de fechamento, para ter uma base do humor do mercado aqui e nos EUA.</p>
+<div class="kpis bolsas">
+<div class="card kpi"><div class="row"><span class="mut">Ibovespa · B3</span><span class="chip eq" id="ibov-c">—</span></div><div class="v" id="ibov-v">—</div><div class="mut" id="ibov-d"></div><div class="fig"><svg id="ch-ibov"></svg></div></div>
+<div class="card kpi"><div class="row"><span class="mut">Nasdaq · EUA</span><span class="chip eq" id="nasdaq-c">—</span></div><div class="v" id="nasdaq-v">—</div><div class="mut" id="nasdaq-d"></div><div class="fig"><svg id="ch-nasdaq"></svg></div></div>
+<div class="card kpi"><div class="row"><span class="mut">S&amp;P 500 · EUA</span><span class="chip eq" id="sp500-c">—</span></div><div class="v" id="sp500-v">—</div><div class="mut" id="sp500-d"></div><div class="fig"><svg id="ch-sp500"></svg></div></div>
+</div>
+<div class="cols band" style="padding-top:18px">
+<div class="card"><h2>Histórico do ESALQ</h2><p class="mut" style="margin:0 0 8px">Centavos de real por libra-peso, pagamento em 8 dias</p>
+<div class="scroll"><table id="hist"><thead><tr><th>Data</th><th>¢R$/lp</th><th>R$/@</th><th>Var. dia</th></tr></thead><tbody></tbody></table></div></div>
+<div class="card"><h2>Fontes</h2><p class="mut" style="margin-top:0">ESALQ: CEPEA/Esalq-USP. Algodão NY: ICE Futures (¢US$/lb, contrato mais negociado). Dólar e euro: comercial à vista (mercado, atualizado durante o dia e no fechamento às 17h) e PTAX do Banco Central (taxa oficial, sai por volta das 13h). Dólar futuro: contrato mais negociado na B3 (mini dólar, R$ por US$). Bolsas: Ibovespa (B3), Nasdaq Composite e S&amp;P 500, em pontos de fechamento.</p>
+<div class="mini"><a class="btn" style="display:inline-flex;align-items:center;text-decoration:none" href="https://www.cepea.org.br/br/indicador/algodao.aspx">Abrir CEPEA</a><a class="btn" style="display:inline-flex;align-items:center;text-decoration:none" href="https://www.bcb.gov.br/estabilidadefinanceira/historicocotacoes">Abrir Banco Central</a></div>
+<details><summary>Atualizar cotação manualmente</summary>
+<form id="fup" class="form">
+<div class="f w"><label for="u-d">Data</label><input id="u-d" type="date"></div>
+<div class="f"><label for="u-e">ESALQ (¢R$/lp)</label><input id="u-e" inputmode="decimal" placeholder="415,58"></div>
+<div class="f"><label for="u-u">Dólar PTAX (R$)</label><input id="u-u" inputmode="decimal" placeholder="5,8889"></div>
+<div class="f"><label for="u-uc">Dólar comercial (R$)</label><input id="u-uc" inputmode="decimal" placeholder="5,8179"></div>
+<div class="f"><label for="u-uf">Dólar futuro B3 (R$)</label><input id="u-uf" inputmode="decimal" placeholder="5,7485"></div>
+<div class="f"><label for="u-r">Euro PTAX (R$)</label><input id="u-r" inputmode="decimal" placeholder="6,47"></div>
+<div class="f"><label for="u-s">Selic (% a.a.)</label><input id="u-s" inputmode="decimal" placeholder="13,75"></div>
+<div class="f w"><button class="pri" type="submit">Salvar para toda a equipe</button><div class="msg" id="u-msg"></div></div>
+</form></details></div>
+</div></div>
+</section>
+
+<section class="view" id="v-noticias"><div class="wrap band">
+<h2>Notícias que mexem com a pluma</h2><p class="mut" style="margin:0">Algodão, câmbio e economia — resumos curtos com link para a matéria completa. Use as setas para ver outros dias.</p>
+<div class="dnav"><button type="button" id="nd-p" aria-label="Dia anterior">‹</button><label class="dlbl" title="Escolher data"><span id="nd-t">—</span><input type="date" id="nd-i" aria-label="Escolher data"></label><button type="button" id="nd-n" aria-label="Próximo dia">›</button><button type="button" id="nd-h" class="hoje">Hoje</button></div>
+<div class="filters" id="nf"></div>
+<div class="news" id="nl"></div>
+</div></section>
+
+<section class="view" id="v-calculadoras"><div class="wrap band">
+<div id="ctop"><h2>Calculadoras</h2><p class="mut" style="margin:0 0 16px">Escolha uma calculadora para abrir.</p>
+<div class="tiles">
+<a class="tile" href="#calc-arroba"><i><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="18" cy="17" r="2.5"/></svg></i><b>Compra e venda por @</b><span>Lucro, margem e custos da operação</span></a>
+<a class="tile" href="#calc-custom"><i><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/><circle cx="12" cy="12" r="9"/></svg></i><b>Personalizada</b><span>Negócios fora da @, financiamentos e empréstimos</span></a>
+<a class="tile" href="#calc-juros"><i><svg viewBox="0 0 24 24"><path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg></i><b>Juros</b><span>Simples ou compostos, futuro ou presente</span></a>
+<a class="tile" href="#calc-fidc"><i><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h4"/></svg></i><b>Juros FIDC</b><span>Antecipação de notas fiscais</span></a>
+<a class="tile" href="#calc-folha"><i><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11h5M18.5 8.5v5"/></svg></i><b>Folha · DP</b><span>Salário, INSS, IRRF, FGTS e retroativo</span></a>
+</div></div>
+<div id="cbar" hidden><a class="back" href="#calculadoras">← Calculadoras</a><h2 id="ctitle"></h2></div>
+
+<div class="calc" data-calc="arroba" hidden>
+<div class="card"><div class="form">
+<div class="f"><label for="a-q">Quantidade</label><input id="a-q" inputmode="decimal" value="1000"></div>
+<div class="f"><label for="a-un">Unidade</label><select id="a-un"><option value="arroba">Arrobas (@)</option><option value="kg">Quilos</option><option value="t">Toneladas</option><option value="fardo">Fardos</option></select></div>
+<div class="f w" id="a-fw" hidden><label for="a-fk">Peso médio do fardo (kg)</label><input id="a-fk" inputmode="decimal" value="220"></div>
+<div class="f"><label for="a-c">Preço de compra (R$/@)</label><input id="a-c" inputmode="decimal" value="135,00"></div>
+<div class="f"><label for="a-v">Preço de venda (R$/@)</label><input id="a-v" inputmode="decimal" value="140,00"></div>
+<div class="f w mini"><button type="button" data-esq="a-c">Compra = ESALQ</button><button type="button" data-esq="a-v">Venda = ESALQ</button></div>
+<div class="f"><label for="a-fr">Frete (R$/t)</label><input id="a-fr" inputmode="decimal" value="0"></div>
+<div class="f"><label for="a-cm">Comissão (% da venda)</label><input id="a-cm" inputmode="decimal" value="0"></div>
+<div class="f w"><label for="a-o">Outros custos (R$)</label><input id="a-o" inputmode="decimal" value="0"></div>
+</div></div>
+<div class="card res"><div class="lbl">Resultado da operação</div><div class="big num" id="a-res">—</div><div id="a-mg" class="lbl"></div><table id="a-t"></table></div>
+</div>
+
+<div class="calc" data-calc="custom" hidden>
+<div class="card"><div class="seg" id="p-ms" style="margin:0 0 14px"><button type="button" data-v="n" class="on">Negócio fora da @</button><button type="button" data-v="f">Financiamento / empréstimo</button></div><input type="hidden" id="p-mo" value="n">
+<div data-pm="n"><p class="mut" style="margin-top:0">Para negócios fechados fora da arroba: em quilo, tonelada, libra-peso, fardo ou em dólar.</p><div class="form">
+<div class="f"><label for="p-p">Preço</label><input id="p-p" inputmode="decimal" value="78,50"></div>
+<div class="f"><label for="p-u">Unidade do preço</label><select id="p-u"><option value="clb">¢US$/lb (padrão NY)</option><option value="ut">US$/tonelada</option><option value="clp">¢R$/lp (padrão ESALQ)</option><option value="rlp">R$/libra-peso</option><option value="rkg">R$/kg</option><option value="rt">R$/tonelada</option><option value="rf">R$/fardo</option></select></div>
+<div class="f"><label for="p-q">Quantidade</label><input id="p-q" inputmode="decimal" value="100"></div>
+<div class="f"><label for="p-qu">Unidade</label><select id="p-qu"><option value="t">Toneladas</option><option value="kg">Quilos</option><option value="lp">Libras-peso</option><option value="fardo">Fardos</option></select></div>
+<div class="f"><label for="p-fk">Peso do fardo (kg)</label><input id="p-fk" inputmode="decimal" value="220"></div>
+<div class="f"><label for="p-d">Dólar (R$)</label><input id="p-d" inputmode="decimal"></div>
+</div></div>
+<div data-pm="f"><p class="mut" style="margin-top:0">Financiamento de máquina, veículo ou imóvel, empréstimo, capital de giro. Tabela Price (parcelas iguais) ou SAC (parcelas que diminuem).</p><div class="form">
+<div class="f w"><label>O que calcular</label><div class="seg" id="fi-cs" style="margin:0"><button type="button" data-v="p" class="on">Valor da parcela</button><button type="button" data-v="t">Taxa de juros cobrada</button></div><input type="hidden" id="fi-c" value="p"></div>
+<div class="f"><label for="fi-v">Valor do bem ou do empréstimo (R$)</label><input id="fi-v" inputmode="decimal" value="100.000,00"></div>
+<div class="f"><label for="fi-e">Entrada (R$)</label><input id="fi-e" inputmode="decimal" value="0"></div>
+<div class="f" data-fc="p"><label for="fi-t">Taxa de juros (%)</label><input id="fi-t" inputmode="decimal" value="1,5"></div>
+<div class="f" data-fc="p"><label for="fi-tp">Período da taxa</label><select id="fi-tp"><option value="m">ao mês</option><option value="a">ao ano</option></select></div>
+<div class="f w" data-fc="t"><label for="fi-pm">Valor da parcela oferecida (R$)</label><input id="fi-pm" inputmode="decimal" value="3.000,00"></div>
+<div class="f"><label for="fi-n">Prazo (meses)</label><input id="fi-n" inputmode="numeric" value="48"></div>
+<div class="f" data-fc="p"><label for="fi-s">Sistema</label><select id="fi-s"><option value="price">Price (parcelas iguais)</option><option value="sac">SAC (parcelas decrescentes)</option></select></div>
+<div class="f"><label for="fi-x">IOF, tarifas e seguros (R$)</label><input id="fi-x" inputmode="decimal" value="0"></div>
+<div class="f"><label for="fi-xf">Esses custos são</label><select id="fi-xf"><option value="f">Financiados (somam na dívida)</option><option value="v">Pagos à vista</option></select></div>
+<div class="f w"><label for="fi-d">1º vencimento (opcional)</label><input id="fi-d" type="date"></div>
+</div></div>
+</div>
+<div class="card res" data-pm="n"><div class="lbl">Valor total do negócio</div><div class="big num" id="p-res">—</div><div id="p-us" class="lbl"></div><table id="p-t"></table></div>
+<div class="card res" data-pm="f"><div class="lbl" id="fi-lb">Parcela mensal</div><div class="big num" id="fi-res">—</div><div id="fi-sub" class="lbl"></div><table id="fi-tab"></table>
+<details style="margin-top:14px"><summary>Ver todas as parcelas</summary><div class="scroll"><table id="fi-sch"></table></div></details>
+<div class="mini" style="margin-top:14px"><button type="button" class="pri" id="fi-copy">Copiar resumo</button><span class="lbl" id="fi-cmsg" style="align-self:center"></span></div></div>
+</div>
+
+<div class="calc" data-calc="juros" hidden>
+<div class="card"><div class="form">
+<div class="f w"><label>Tipo de juros</label><div class="seg" id="j-m" style="margin:0"><button type="button" data-v="c" class="on">Compostos</button><button type="button" data-v="s">Simples</button></div></div>
+<div class="f w"><label>Operação</label><div class="seg" id="j-o" style="margin:0"><button type="button" data-v="f" class="on">Corrigir para o futuro</button><button type="button" data-v="d">Trazer a valor presente</button></div></div>
+<div class="f w"><label for="j-v">Valor (R$)</label><input id="j-v" inputmode="decimal" value="100.000,00"></div>
+<div class="f"><label for="j-t">Taxa (%)</label><input id="j-t" inputmode="decimal" value="1,5"></div>
+<div class="f"><label for="j-tp">Período da taxa</label><select id="j-tp"><option value="m">ao mês</option><option value="a">ao ano</option></select></div>
+<div class="f"><label for="j-p">Prazo</label><input id="j-p" inputmode="decimal" value="90"></div>
+<div class="f"><label for="j-pu">Unidade do prazo</label><select id="j-pu"><option value="d">dias corridos</option><option value="m">meses</option><option value="a">anos</option></select></div>
+<div class="f w mini" id="j-pre"></div>
+</div></div>
+<div class="card res"><div class="lbl" id="j-lb">Valor futuro</div><div class="big num" id="j-res">—</div><div id="j-jr" class="lbl"></div><table id="j-t"></table></div>
+</div>
+<div class="calc" data-calc="fidc" hidden>
+<div class="card"><p class="mut" style="margin-top:0">Antecipação de notas no FIDC: juros simples = valor × taxa ao mês ÷ 30 × (prazo + float).</p><div class="form">
+<div class="f w"><label for="x-n">Nome da FIDC</label><input id="x-n" value="SB"></div>
+<div class="f"><label for="x-t">Taxa (% ao mês)</label><input id="x-t" inputmode="decimal" value="1,70"></div>
+<div class="f"><label for="x-fl">Float (dias)</label><input id="x-fl" inputmode="numeric" value="1"></div>
+<div class="f w"><label for="x-op">Data da operação</label><input id="x-op" type="date"></div>
+</div>
+<h3 style="font-size:18px;margin:20px 0 0">Notas e parcelas</h3>
+<div id="x-list"></div>
+<div class="mini" style="margin-top:12px"><button type="button" class="pri" id="x-add">+ Adicionar parcela</button><button type="button" id="x-dup">Repetir última</button><button type="button" id="x-clr">Limpar tudo</button></div>
+<p class="note" id="x-ex"></p>
+</div>
+<div class="card res"><div class="lbl">Valor líquido a receber</div><div class="big num pos" id="x-res">—</div><div id="x-jr" class="lbl"></div><table id="x-t"></table>
+<div id="x-rows" style="margin-top:14px"></div>
+<div class="mini" style="margin-top:14px"><button type="button" class="pri" id="x-copy">Copiar resumo</button><span class="lbl" id="x-cmsg" style="align-self:center"></span></div></div>
+</div>
+<div class="calc" data-calc="folha" hidden>
+<div class="card"><div class="form">
+<div class="f w"><label>O que calcular</label><div class="seg" id="d-ms" style="margin:0"><button type="button" data-v="m" class="on">Folha mensal</button><button type="button" data-v="f">Férias + 1/3</button><button type="button" data-v="t">13º salário</button></div><input type="hidden" id="d-mo" value="m"></div>
+<div class="f w"><label for="d-n">Funcionário (opcional)</label><input id="d-n" placeholder="Nome"></div>
+<div class="f"><label for="d-s">Salário base (R$)</label><input id="d-s" inputmode="decimal" value="3.500,00"></div>
+<div class="f"><label for="d-ad" id="d-adl">Adicionais tributáveis (R$)</label><input id="d-ad" inputmode="decimal" value="0" placeholder="comissões, prêmios…"></div>
+<div class="f"><label for="d-dp">Dependentes para IR</label><input id="d-dp" inputmode="numeric" value="0"></div>
+<div class="f" data-m="m"><label for="d-aj">Ajuda de custo (R$)</label><input id="d-aj" inputmode="decimal" value="0"></div>
+<div class="f" data-m="f"><label for="d-fd">Dias de férias</label><input id="d-fd" inputmode="numeric" value="30"></div>
+<div class="f" data-m="f"><label for="d-fv">Vender 10 dias (abono)?</label><select id="d-fv"><option value="n">Não</option><option value="s">Sim</option></select></div>
+<div class="f" data-m="f"><label for="d-ft">1/3 de férias manual (R$)</label><input id="d-ft" inputmode="decimal" placeholder="vazio = calcula sozinho"></div>
+<div class="f" data-m="f"><label for="d-fa13">Adiantamento do 13º nas férias (R$)</label><input id="d-fa13" inputmode="decimal" value="0"></div>
+<div class="f" data-m="t"><label for="d-13a">Meses trabalhados no ano (avos)</label><input id="d-13a" inputmode="numeric" value="12"></div>
+<div class="f" data-m="t"><label for="d-13p">Parcela</label><select id="d-13p"><option value="1">1ª parcela (até 30/11)</option><option value="2">2ª parcela (até 20/12)</option><option value="i">Parcela única</option></select></div>
+<div class="f w" data-m="t"><label for="d-13ad">Adiantamento do 13º já recebido (R$)</label><input id="d-13ad" inputmode="decimal" placeholder="vazio = usa 50% (1ª parcela)"></div>
+</div>
+<div data-m="m"><h3 style="font-size:18px;margin:20px 0 4px">Horas extras, faltas e atrasos</h3><p class="mut" style="margin:0 0 10px">Digite as horas como 2:30 ou 2,5. O valor sai do salário ÷ jornada.</p><div class="form">
+<div class="f"><label for="d-jh">Jornada mensal (horas)</label><input id="d-jh" inputmode="decimal" value="220"></div>
+<div class="f w"><label for="d-vh">Valor da hora (calculado)</label><input id="d-vh" readonly tabindex="-1" style="opacity:.8"></div>
+<div class="f"><label for="d-h50">Horas extras 50% (horas)</label><input id="d-h50" inputmode="decimal" value="0"></div>
+<div class="f"><label for="d-h100">Horas extras 100% (horas)</label><input id="d-h100" inputmode="decimal" value="0"></div>
+<div class="f"><label for="d-du">Dias úteis no mês</label><input id="d-du" inputmode="numeric" value="25"></div>
+<div class="f"><label for="d-dd">Domingos e feriados no mês</label><input id="d-dd" inputmode="numeric" value="5"></div>
+<div class="f"><label for="d-fa">Faltas (dias)</label><input id="d-fa" inputmode="numeric" value="0"></div>
+<div class="f"><label for="d-dsr">DSR perdido pelas faltas (dias)</label><input id="d-dsr" inputmode="numeric" value="0"></div>
+<div class="f w"><label for="d-fh">Atrasos e saídas (horas)</label><input id="d-fh" inputmode="decimal" value="0"></div>
+</div></div>
+<div data-m="m"><h3 style="font-size:18px;margin:20px 0 4px">Vales e descontos</h3><p class="mut" style="margin:0 0 10px">Descontados do líquido; não mudam INSS, IR nem FGTS.</p><div class="form">
+<div class="f"><label for="d-vale">Vale (adiantamento) (R$)</label><input id="d-vale" inputmode="decimal" value="0"></div>
+<div class="f"><label for="d-cfgts">Empréstimo consignado FGTS (R$)</label><input id="d-cfgts" inputmode="decimal" value="0"></div>
+<div class="f"><label for="d-cmed">Convênio médico (R$)</label><input id="d-cmed" inputmode="decimal" value="0"></div>
+<div class="f"><label for="d-codo">Convênio odontológico (R$)</label><input id="d-codo" inputmode="decimal" value="0"></div>
+<div class="f"><label for="d-comb">Combustível (R$)</label><input id="d-comb" inputmode="decimal" value="0"></div>
+<div class="f"><label for="d-emp">Empréstimo (R$)</label><input id="d-emp" inputmode="decimal" value="0"></div>
+<div class="f"><label for="d-farm">Farmácia (R$)</label><input id="d-farm" inputmode="decimal" value="0"></div>
+<div class="f"><label for="d-ou">Outros descontos (R$)</label><input id="d-ou" inputmode="decimal" value="0"></div>
+</div><div id="d-xl"></div><input type="hidden" id="d-x" value="[]"><div class="mini" style="margin-top:12px"><button type="button" id="d-xa">+ Adicionar outro desconto</button></div><p class="mut" id="d-vt" style="margin:8px 0 0"></p></div>
+<div data-m="m"><h3 style="font-size:18px;margin:20px 0 4px">Reajuste ou dissídio</h3><p class="mut" style="margin:0 0 10px">Percentual do dissídio da categoria ou do reajuste. Deixe 0 se não houver.</p><div class="form">
+<div class="f"><label for="d-rj">Reajuste / dissídio (%)</label><input id="d-rj" inputmode="decimal" value="0"></div>
+<div class="f"><label for="d-rm">Meses de retroativo</label><input id="d-rm" inputmode="numeric" value="0"></div>
+</div></div>
+<p class="note" id="d-nt"></p>
+</div>
+<div class="card res"><div class="lbl" id="d-lb">Salário líquido a receber</div><div class="big num pos" id="d-res">—</div><div id="d-sub" class="lbl"></div><table id="d-t"></table>
+<div class="lbl" style="margin:14px 0 4px">INSS por faixa e IR</div><table id="d-f"></table>
+<div class="mini" style="margin-top:14px"><button type="button" class="pri" id="d-copy">Copiar holerite</button><span class="lbl" id="d-cmsg" style="align-self:center"></span></div></div>
+</div>
+<div class="card hbox" id="hbox" hidden>
+<div class="hhead"><h3>Histórico <small class="mut" id="h-dl" style="font:500 13px Inter"></small></h3><select id="h-dep" hidden style="width:auto;min-height:40px"></select><div class="mini"><button type="button" class="pri" id="h-save">+ Salvar este cálculo</button></div></div>
+<div class="msg mut" id="h-msg"></div>
+<div class="hfil" id="h-fil" hidden>
+<div class="f"><label for="h-di">Data inicial</label><input id="h-di" type="date"></div>
+<div class="f"><label for="h-df">Data final</label><input id="h-df" type="date"></div>
+<div class="f"><label for="h-por">Buscar por</label><select id="h-por"><option value="nf">Nº do documento</option><option value="fidc">FIDC</option><option value="bruto">Valor bruto</option></select></div>
+<div class="f t"><label for="h-q">Busca</label><input id="h-q" placeholder="Ex.: 2614"></div>
+<button type="button" id="h-clr">Limpar filtros</button>
+</div>
+<div class="mut" id="h-cnt"></div>
+<div id="h-list"></div>
+</div>
+<p class="note" id="cnote" hidden>Conversões CEPEA: 1 libra-peso = 0,453597 kg · 1 @ = 15 kg = 33,069 lp. Resultados são estimativas; confira antes de fechar negócio.</p>
+</div></section>
+
+<section class="view" id="v-equipe"><div class="wrap band">
+<h2>Equipe e acessos</h2><p class="mut" style="margin:0 0 12px">Libere quem se cadastrou, ajuste o departamento e defina administradores. As permissões por departamento vêm depois.</p>
+<div class="filters" id="eq-f"></div><div class="card" id="eq-l"><p class="mut">Carregando…</p></div><div class="msg mut" id="eq-m"></div>
+</div></section>
+<nav class="tabs" aria-label="Seções">
+<a href="#mercado" data-v="mercado"><svg viewBox="0 0 24 24"><path d="M3 17l5-5 4 3 8-8"/><path d="M15 7h5v5"/></svg>Mercado</a>
+<a href="#noticias" data-v="noticias"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>Notícias</a>
+<a href="#calculadoras" data-v="calculadoras"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/></svg>Calculadoras</a>
+<a href="#equipe" data-v="equipe" id="nav-eq" hidden><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15 14.5c3.5-.8 6 1.5 6 5"/></svg>Equipe</a>
+</nav>
+
+<script>
+{
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const LPA=33.069,LPK=2.2046;
+const nf=(v,d=2)=>v==null||!isFinite(v)?'—':v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const brl=(v,d=2)=>'R$ '+nf(v,d);
+const num=s=>{s=String(s??'').trim().replace(/\s|R\$|%/g,'');if(!s)return NaN;if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');else if(/^-?\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');return parseFloat(s)};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fd=s=>{const p=String(s).split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:s};
+const fds=s=>fd(s).slice(0,5);
+const last=a=>a&&a.length?a[a.length-1]:null;
+const chg=a=>a&&a.length>1?(a[a.length-1].v/a[a.length-2].v-1)*100:null;
+let M=null,N=null,db=null,nfil='Todas',mcp=null,rfPend=false;
+
+function chip(el,c){el.className='chip '+(c==null?'eq':c>0.005?'up':c<-0.005?'dn':'eq');el.textContent=c==null?'sem variação':(c>0?'▲ ':c<0?'▼ ':'')+nf(Math.abs(c))+'%'}
+
+function chart(s,data,o){s._d=data;s._o=o||{};if(!s._ro){s._ro=new ResizeObserver(()=>draw(s));s._ro.observe(s)}draw(s)}
+function draw(s){const data=s._d,o=s._o,W=s.clientWidth,H=s.clientHeight;
+ if(!W||!data||data.length<2){s.innerHTML=data&&data.length===1&&W?`<text x="0" y="${H-8}" fill="currentColor" opacity=".5" font-size="12">histórico começa a crescer com as atualizações</text>`:'';return}
+ const mini=o.mini,pad=mini?{l:2,r:2,t:6,b:4}:{l:4,r:W<520?44:58,t:18,b:28};
+ const vs=data.map(p=>p.v);let mn=Math.min(...vs),mx=Math.max(...vs);const sp=(mx-mn)||mx*.01;mn-=sp*.2;mx+=sp*.2;
+ const X=i=>pad.l+i*(W-pad.l-pad.r)/(data.length-1),Y=v=>pad.t+(mx-v)/(mx-mn)*(H-pad.t-pad.b);
+ const ln=data.map((p,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(p.v).toFixed(1)).join('');
+ const col=o.col||'#19c3a3',id='g'+s.id;let g='';
+ if(!mini){for(let k=0;k<=3;k++){const v=mn+(mx-mn)*k/3,y=Y(v);g+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y}" y2="${y}" stroke="currentColor" opacity=".12"/><text x="${W-pad.r+8}" y="${y+4}" fill="currentColor" opacity=".6" font-size="12">${nf(v,o.dec??0)}</text>`}
+  const idx=W<520?[0,data.length-1]:[0,Math.floor((data.length-1)/2),data.length-1];
+  idx.forEach((i,j)=>{g+=`<text x="${X(i)}" y="${H-6}" fill="currentColor" opacity=".6" font-size="12" text-anchor="${j===0?'start':j===idx.length-1?'end':'middle'}">${fds(data[i].d)}</text>`})}
+ const lx=X(data.length-1),ly=Y(last(data).v);
+ s.innerHTML=`<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".45"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient><filter id="f${id}"><feGaussianBlur stdDeviation="3"/></filter></defs>${g}
+ <path d="${ln}L${lx} ${H-pad.b}L${X(0)} ${H-pad.b}Z" fill="url(#${id})"/>
+ ${mini?'':`<path d="${ln}" fill="none" stroke="${col}" stroke-width="5" opacity=".35" filter="url(#f${id})"/>`}
+ <path d="${ln}" fill="none" stroke="${col}" stroke-width="${mini?2:2.5}" stroke-linejoin="round"/>
+ ${mini?'':`<circle cx="${lx}" cy="${ly}" r="9" fill="${col}" opacity=".3" class="pulse"/><circle cx="${lx}" cy="${ly}" r="4.5" fill="#fff" stroke="${col}" stroke-width="2"/>`}`}
+
+function renderMercado(){
+ if(!M){return}
+ const e=last(M.esalq),u=[last(M.usdCom),last(M.usd)].filter(Boolean).sort((a,b)=>a.d<b.d?1:-1)[0]||null,r=last(M.eur);
+ if(e){$('#esq-v').innerHTML=nf(e.v)+'<span>¢R$/lp</span>';chip($('#esq-c'),chg(M.esalq));$('#esq-d').textContent='Fechamento de '+fd(e.d);
+  $('#esq-a').textContent=brl(e.v/100*LPA);$('#esq-u').textContent=u?nf(e.v/u.v)+' ¢US$/lp':'—';chart($('#ch-esq'),M.esalq.slice(-30),{dec:0,col:'#3fe0bd'})}
+ const cc=(a)=>{const c=chg(a);return c==null?'':' <span style="color:'+(c>0?'var(--up)':c<0?'var(--dn)':'inherit')+'">'+(c>0?'▲':c<0?'▼':'')+nf(Math.abs(c))+'%</span>'};
+ [['usd','#19c3a3'],['eur','#7fb2ff']].forEach(([k,col])=>{const com=M[k+'Com'],pt=M[k],fu=k==='usd'?M.usdFut:null,pc=last(com),pp=last(pt);
+  const main=pc&&(!pp||pc.d>=pp.d)?['c',pc,com]:pp?['p',pp,pt]:null;if(!main)return;
+  $('#'+k+'-v').textContent=brl(main[1].v,4);chip($('#'+k+'-c'),chg(main[2]));
+  $('#'+k+'-d').textContent=(main[0]==='c'?(M.fonte?.[k+'Com']||'Comercial'):(M.fonte?.[k]||'PTAX BCB'))+' · '+fd(main[1].d);
+  const L=[];if(main[0]==='c'&&pp)L.push([/intradia/i.test(M.fonte?.[k]||'')?(M.fonte[k]):'PTAX',pp,pt]);if(main[0]==='p'&&pc)L.push([M.fonte?.[k+'Com']||'Comercial',pc,com]);const pf=last(fu);if(pf)L.push([(M.fonte?.usdFut||'Dólar futuro B3'),pf,fu]);
+  $('#'+k+'-x').innerHTML=L.map(([n,p,a])=>'<div><span>'+esc(n)+' · '+fds(p.d)+'</span><b>'+brl(p.v,4)+'</b></div>').join('');$('#'+k+'-x').hidden=!L.length;
+  chart($('#ch-'+k),(main[2].length>=pt?.length?main[2]:pt||[]).slice(-30),{mini:1,col})});
+ [['ibov','#19c3a3'],['nasdaq','#7fb2ff'],['sp500','#c79bff']].forEach(([k,col])=>{const a=M[k],p=last(a);if(!p)return;$('#'+k+'-v').textContent=nf(p.v,0)+' pts';chip($('#'+k+'-c'),chg(a));$('#'+k+'-d').textContent='Fechamento de '+fd(p.d);chart($('#ch-'+k),a.slice(-30),{mini:1,col})});
+ const ic=last(M.ice);if(ic){$('#ice-v').textContent=nf(ic.v)+' ¢';chip($('#ice-c'),chg(M.ice));$('#ice-d').textContent=(M.fonte?.ice||'¢US$/lb')+' · '+fd(ic.d)+(u?' · ≈ '+brl(ic.v/100*u.v*LPA)+'/@':'');chart($('#ch-ice'),M.ice.slice(-30),{mini:1,col:'#f2b84b'})}
+ if(M.selic!=null){$('#sel-v').textContent=nf(M.selic)+'%';$('#sel-d').textContent='ao ano'+(M.selicData?' · desde '+fd(M.selicData):'')}
+ const h=(M.esalq||[]).slice(-10).reverse();
+ $('#hist tbody').innerHTML=h.map((p,i)=>{const pv=h[i+1];const c=pv?(p.v/pv.v-1)*100:null;return `<tr><td>${fd(p.d)}</td><td>${nf(p.v)}</td><td>${brl(p.v/100*LPA)}</td><td class="${c>0?'pos':c<0?'neg':''}" style="color:${c>0?'var(--up)':c<0?'var(--dn)':'inherit'}">${c==null?'—':(c>0?'+':'')+nf(c)+'%'}</td></tr>`}).join('');
+ $('#upd').textContent='Atualizado '+(M.atualizado||'')+(M.verificado?' · conferido '+M.verificado:'');
+ {const no=$('#nota');no.hidden=!M.nota;no.textContent=M.nota||''}
+ if(rfPend){rfPend=false;$('#rf').disabled=false;$('#rfm').textContent='Pronto: dados conferidos agora.';setTimeout(()=>{$('#rfm').hidden=true},8000)}
+ if(!$('#p-d').value&&u)$('#p-d').value=nf(u.v,4);
+ calcAll()}
+
+const spHoje=()=>new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
+let ND=spHoje(),NDAY=[],ndUnsub=null;
+const addD=(d,k)=>{const x=new Date(d+'T12:00:00Z');x.setUTCDate(x.getUTCDate()+k);return x.toISOString().slice(0,10)};
+const WD=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+function newsDay(d){if(!d)return;const h=spHoje();if(d>h)d=h;ND=d;NDAY=[];if(ndUnsub){try{ndUnsub()}catch(e){}ndUnsub=null}
+ if(db)ndUnsub=db.doc('noticiasDia/'+d).onSnapshot(s=>{NDAY=s.exists?(s.data().itens||[]):[];renderNews()},()=>{});renderNews()}
+function renderNews(){
+ const h=spHoje();$('#nd-t').innerHTML=fd(ND)+'<small>'+(ND===h?'hoje · ':'')+WD[new Date(ND+'T12:00:00Z').getUTCDay()]+'</small>';$('#nd-i').value=ND;$('#nd-i').max=h;$('#nd-n').disabled=ND>=h;$('#nd-h').disabled=ND===h;
+ const seen=new Set(),it=[];[...NDAY,...(N?.itens||[]).filter(n=>n.d===ND)].forEach(n=>{const k=n.u||n.t;if(!seen.has(k)){seen.add(k);it.push(n)}});
+ const ord={'Algodão':0,'Câmbio':1,'Economia':2};it.sort((a,b)=>(ord[a.c]??3)-(ord[b.c]??3));
+ const cats=['Todas',...new Set(it.map(n=>n.c))];if(!cats.includes(nfil))nfil='Todas';
+ $('#nf').innerHTML=cats.length>1?cats.map(c=>`<button type="button" class="${c===nfil?'on':''}" data-f="${esc(c)}">${esc(c)}${c==='Todas'?' ('+it.length+')':''}</button>`).join(''):'';
+ const l=it.filter(n=>nfil==='Todas'||n.c===nfil);
+ $('#nl').innerHTML=l.length?l.map(n=>{const u=/^https:\/\//.test(n.u||'')?esc(n.u):'#';return `<a class="card" href="${u}" target="_blank" rel="noopener"><span class="tag">${esc(n.c)}</span> <span class="mut">${fd(n.d)} · ${esc(n.f)}</span><h3>${esc(n.t)}</h3><div class="mut">${esc(n.r)}</div></a>`}).join(''):'<p class="mut">Nenhuma notícia salva para '+fd(ND)+'. Use as setas para ver outros dias.</p>'}
+$('#nd-p').addEventListener('click',()=>newsDay(addD(ND,-1)));
+$('#nd-n').addEventListener('click',()=>newsDay(addD(ND,1)));
+$('#nd-h').addEventListener('click',()=>newsDay(spHoje()));
+$('#nd-i').addEventListener('change',e=>newsDay(e.target.value));
+$('#nf').addEventListener('click',e=>{const b=e.target.closest('button');if(b){nfil=b.dataset.f;renderNews()}});
+
+/* ---- calculadoras ---- */
+const esqA=()=>{const e=last(M?.esalq);return e?e.v/100*LPA:NaN};
+const usdNow=()=>[last(M?.usdCom),last(M?.usd)].filter(Boolean).sort((a,b)=>a.d<b.d?1:-1)[0]?.v;
+const dol=()=>{const v=num($('#p-d').value);return isFinite(v)&&v>0?v:usdNow()};
+const rows=(el,r)=>el.innerHTML=r.map(([a,b,c])=>`<tr><td>${a}</td><td class="${c||''}">${b}</td></tr>`).join('');
+function calcA(){
+ $('#a-fw').hidden=$('#a-un').value!=='fardo';
+ const q=num($('#a-q').value),un=$('#a-un').value,fk=num($('#a-fk').value);
+ const kg=q*({arroba:15,kg:1,t:1000,fardo:fk}[un]),ar=kg/15;
+ const c=num($('#a-c').value),v=num($('#a-v').value),fr=(num($('#a-fr').value)||0)*kg/1000,cm=(num($('#a-cm').value)||0)/100,o=num($('#a-o').value)||0;
+ const tc=ar*c,tv=ar*v,com=tv*cm,cus=fr+com+o,lu=tv-tc-cus,u=usdNow(),e=esqA();
+ $('#a-res').textContent=isFinite(lu)?brl(lu):'—';$('#a-res').className='big num '+(lu<0?'neg':'pos');
+ $('#a-mg').textContent=isFinite(lu)&&tc?'Margem de '+nf(lu/tc*100)+'% sobre a compra · '+brl(lu/ar)+' por @':'';
+ rows($('#a-t'),[['Volume',nf(ar,1)+' @ · '+nf(kg/1000,3)+' t'],['Total da compra',brl(tc)],['Total da venda',brl(tv)],['Frete',brl(fr)],['Comissão',brl(com)],['Outros custos',brl(o)],['Custo total por @',brl((tc+cus)/ar)],
+  ['Compra em ¢R$/lp',nf(c/LPA*100)],['Compra em ¢US$/lp',u?nf(c/LPA/u*100):'—'],['Compra vs ESALQ',isFinite(e)?(c>=e?'+':'')+nf((c/e-1)*100)+'%':'—']])}
+function calcP(){
+ const p=num($('#p-p').value),pu=$('#p-u').value,q=num($('#p-q').value),qu=$('#p-qu').value,fk=num($('#p-fk').value),d=dol();
+ const rkg={clb:p/100*(d||NaN)*LPK,ut:p*(d||NaN)/1000,clp:p/100*LPK,rlp:p*LPK,rkg:p,rt:p/1000,rf:p/fk}[pu];
+ const kg=q*({t:1000,kg:1,lp:1/LPK,fardo:fk}[qu]),tot=rkg*kg,e=last(M?.esalq);
+ $('#p-res').textContent=isFinite(tot)?brl(tot):'—';
+ $('#p-us').textContent=d&&isFinite(tot)?'≈ US$ '+nf(tot/d)+' · dólar a R$ '+nf(d,4):'Informe o dólar para preços em US$';
+ rows($('#p-t'),[['Volume',nf(kg/1000,3)+' t · '+nf(kg/15,1)+' @'],['R$/@',brl(rkg*15)],['R$/kg',brl(rkg,4)],['R$/tonelada',brl(rkg*1000)],['¢R$/lp',nf(rkg/LPK*100)],['¢US$/lb',d?nf(rkg/LPK/d*100):'—'],['US$/tonelada',d?'US$ '+nf(rkg*1000/d):'—'],
+  ['vs ESALQ hoje',e&&isFinite(rkg)?((rkg/LPK*100)>=e.v?'+':'')+nf((rkg/LPK*100/e.v-1)*100)+'%':'—',e&&rkg/LPK*100<e.v?'neg':'pos']])}
+let jm='c',jo='f';
+function calcJ(){
+ const P=num($('#j-v').value),i=num($('#j-t').value)/100,tp=$('#j-tp').value,pr=num($('#j-p').value),pu=$('#j-pu').value;
+ const n=tp==='m'?{d:pr/30,m:pr,a:pr*12}[pu]:{d:pr/365,m:pr/12,a:pr}[pu];
+ const f=jm==='c'?Math.pow(1+i,n):1+i*n,R=jo==='f'?P*f:P/f,J=Math.abs(R-P);
+ const eq=tp==='m'?(jm==='c'?Math.pow(1+i,12)-1:i*12):(jm==='c'?Math.pow(1+i,1/12)-1:i/12);
+ $('#j-lb').textContent=jo==='f'?'Valor futuro':'Valor presente';$('#j-res').textContent=isFinite(R)?brl(R):'—';
+ $('#j-jr').textContent=isFinite(J)?(jo==='f'?'Juros de ':'Desconto de ')+brl(J):'';
+ rows($('#j-t'),[['Valor informado',brl(P)],['Taxa no período',nf((f-1)*100,4)+'%'],[tp==='m'?'Equivalente ao ano':'Equivalente ao mês',nf(eq*100,4)+'%'],['Prazo em '+(tp==='m'?'meses':'anos'),nf(n,3)],['Fórmula',jm==='c'?'P × (1 + i)ⁿ':'P × (1 + i × n)']])}
+/* ---- FIDC ---- */
+const XK='pluma-fidc',EX=[{nf:'2614',venc:'2027-02-01',valor:'95.846,37'},{nf:'2614',venc:'2027-02-10',valor:'95.847,00'},{nf:'2614',venc:'2027-02-22',valor:'95.847,00'}];
+let X;try{X=JSON.parse(localStorage.getItem(XK)||'null')}catch(e){}
+const isEx=!Array.isArray(X);if(isEx)X=EX.map(r=>({...r}));
+$('#x-ex').textContent=isEx?'Começa com o exemplo da sua planilha (NF 2614, SB): troque pelos dados da operação.':'';
+const xsave=()=>{try{localStorage.setItem(XK,JSON.stringify(X))}catch(e){}};
+const D=s=>s?new Date(s+'T12:00:00'):null;
+function xlist(){$('#x-list').innerHTML=X.length?X.map((r,i)=>`<div class="prow">
+<div class="f"><label for="xn${i}">NF nº</label><input id="xn${i}" data-i="${i}" data-k="nf" inputmode="numeric" value="${esc(r.nf)}"></div>
+<div class="f"><label for="xv${i}">Vencimento</label><input id="xv${i}" data-i="${i}" data-k="venc" type="date" value="${esc(r.venc)}"></div>
+<div class="f"><label for="xa${i}">Valor (R$)</label><input id="xa${i}" data-i="${i}" data-k="valor" inputmode="decimal" value="${esc(r.valor)}"></div>
+<button type="button" class="x" data-del="${i}" aria-label="Remover parcela ${i+1}">Remover</button></div>`).join(''):'<p class="mut">Nenhuma parcela. Toque em “Adicionar parcela”.</p>'}
+let XS='';
+function calcX(){
+ const t=num($('#x-t').value)/100,fl=num($('#x-fl').value)||0,op=$('#x-op').value,nm=$('#x-n').value||'FIDC';
+ let tv=0,tj=0,tvp=0;
+ const R=X.map(r=>{const v=num(r.valor),pz=op&&r.venc?Math.round((D(r.venc)-D(op))/864e5):NaN,dt=pz+fl,j=v*t/30*dt;
+  if(isFinite(j)&&isFinite(v)){tv+=v;tj+=j;tvp+=v*pz}return{...r,v,pz,dt,j,l:v-j,tf:pz>0?j/v/pz*30:NaN}});
+ const liq=tv-tj,tef=tvp?tj/tvp*30:NaN,pm=tv?tvp/tv:NaN;
+ $('#x-res').textContent=tv?brl(liq):'—';
+ $('#x-jr').textContent=tv?'Juros de '+brl(tj)+' sobre '+brl(tv)+' em NFs':'Preencha vencimento e valor das parcelas';
+ rows($('#x-t'),[['FIDC',esc(nm)],['Valor total das NFs',brl(tv)],['Juros total',brl(tj),'neg'],['Líquido total',brl(liq),'pos'],['Taxa nominal (com float)',nf(t*100)+'% a.m.'],['Taxa final efetiva',isFinite(tef)?nf(tef*100)+'% a.m.':'—'],['Prazo médio ponderado',isFinite(pm)?nf(pm,0)+' dias':'—'],['Float',nf(fl,0)+' dia(s)']]);
+ $('#x-rows').innerHTML=R.length?'<div class="lbl" style="margin-bottom:4px">Por parcela</div>'+R.map((r,i)=>`<div class="xr"><div><b>${i+1}) ${r.venc?fd(r.venc):'sem vencimento'}</b><span>NF ${esc(r.nf||'-')} · ${isFinite(r.dt)?r.pz+' + '+fl+' = '+r.dt+' dias':'—'}</span></div><div><b>${brl(r.l)}</b><span>juros ${brl(r.j)} · ${isFinite(r.tf)?nf(r.tf*100)+'%':'—'}</span></div></div>`).join(''):'';
+ XS=`Operação FIDC ${nm} — ${op?fd(op):''}\nTaxa ${nf(t*100)}% a.m. · float ${fl} dia(s)\n`+R.map((r,i)=>`${i+1}) NF ${r.nf||'-'} · venc. ${r.venc?fd(r.venc):'-'} · ${isFinite(r.dt)?r.dt:'-'} dias · valor ${brl(r.v)} · juros ${brl(r.j)} · líquido ${brl(r.l)}`).join('\n')+`\nTOTAL: NFs ${brl(tv)} · juros ${brl(tj)} · líquido ${brl(liq)} · taxa final ${isFinite(tef)?nf(tef*100):'-'}% a.m.`}
+$('#x-list').addEventListener('input',e=>{const el=e.target;if(el.dataset.i==null)return;X[+el.dataset.i][el.dataset.k]=el.value;xsave();calcX()});
+$('#x-list').addEventListener('click',e=>{const b=e.target.closest('[data-del]');if(!b)return;X.splice(+b.dataset.del,1);xsave();xlist();calcX()});
+$('#x-add').addEventListener('click',()=>{const l=X[X.length-1];X.push({nf:l?l.nf:'',venc:'',valor:''});xsave();xlist();calcX();const n=document.getElementById('xv'+(X.length-1));if(n)n.focus()});
+$('#x-dup').addEventListener('click',()=>{const l=X[X.length-1];X.push(l?{...l}:{nf:'',venc:'',valor:''});xsave();xlist();calcX()});
+$('#x-clr').addEventListener('click',()=>{X=[{nf:'',venc:'',valor:''}];xsave();$('#x-ex').textContent='';xlist();calcX()});
+$('#x-copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(XS);$('#x-cmsg').textContent='Copiado!'}catch(e){$('#x-cmsg').textContent='Não foi possível copiar aqui'}setTimeout(()=>$('#x-cmsg').textContent='',2500)});
+xlist();
+/* ---- Folha DP (tabelas 2026) ---- */
+const INSS=[[1621.00,.075],[2902.84,.09],[4354.27,.12],[8475.55,.14]];
+const IRT=[[2428.80,0,0],[2826.65,.075,182.16],[3751.05,.15,394.16],[4664.68,.225,675.49],[Infinity,.275,908.73]],IRDEP=189.59,IRSIMP=607.20;
+const r2=v=>Math.round(v*100+1e-6)/100;
+function inss(b){let t=0,lo=0;const f=[];for(const [hi,a] of INSS){const part=Math.max(0,Math.min(b,hi)-lo);const v=part*a;f.push([lo,hi,a,part,r2(v)]);t+=v;lo=hi;if(b<=hi)break}return{t:r2(t),f}}
+function irTab(b){for(const [hi,a,d] of IRT)if(b<=hi)return{a,v:Math.max(0,r2(b*a-d))}}
+function irrf(trib,ins,dep){const b1=Math.max(0,trib-ins-dep*IRDEP),b2=Math.max(0,trib-IRSIMP);const t1=irTab(b1),t2=irTab(b2);const s=t2.v<t1.v;const base=s?b2:b1,tb=s?t2:t1;
+ let red=0;if(trib<=5000)red=Math.min(tb.v,312.89);else if(trib<=7350)red=Math.min(tb.v,Math.max(0,r2(978.62-0.133145*trib)));
+ return{base,a:tb.a,tab:tb.v,red,v:r2(tb.v-red),simp:s}}
+const VALES=[["vale", "Vale (adiantamento)"], ["cfgts", "Empréstimo consignado FGTS"], ["cmed", "Convênio médico"], ["codo", "Convênio odontológico"], ["comb", "Combustível"], ["emp", "Empréstimo"], ["farm", "Farmácia"], ["ou", "Outros descontos"]];
+let DS='',DX=[];
+const hrs=v=>{v=String(v??'').trim();if(v.includes(':')){const[h,m]=v.split(':');return(parseInt(h)||0)+(parseInt(m)||0)/60}const n=num(v);return isFinite(n)?n:0};
+const hfmt=h=>{const t=Math.round(h*60);return Math.floor(t/60)+'h'+String(t%60).padStart(2,'0')};
+function dxSync(){const j=$('#d-x').value||'[]';if(j!==JSON.stringify(DX)){try{DX=JSON.parse(j)}catch(e){DX=[]}if(!Array.isArray(DX))DX=[];dxList()}}
+function dxList(){$('#d-xl').innerHTML=DX.map((r,i)=>`<div class="prow" style="grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) auto"><div class="f"><label for="dxn${i}">Desconto</label><input id="dxn${i}" data-xi="${i}" data-xk="n" value="${esc(r.n)}" placeholder="Ex.: uniforme"></div><div class="f"><label for="dxv${i}">Valor (R$)</label><input id="dxv${i}" data-xi="${i}" data-xk="v" inputmode="decimal" value="${esc(r.v)}"></div><button type="button" class="x" data-xd="${i}" aria-label="Remover desconto">Remover</button></div>`).join('')}
+const dxPut=()=>{$('#d-x').value=JSON.stringify(DX);calcD();save()};
+
+const NT={m:'Faltas descontam salário ÷ 30 por dia (e o DSR perdido). Retroativo = diferença do reajuste × meses; o INSS da diferença é calculado mês a mês. Reflexos em 13º e férias não entram.',
+ f:'Férias = (salário + média de variáveis) ÷ 30 × dias, mais 1/3. O abono (10 dias vendidos + 1/3) não tem INSS, IR nem FGTS. O IR das férias é calculado em separado do salário do mês.',
+ t:'13º = (salário + média de variáveis) ÷ 12 × meses trabalhados (15 dias ou mais no mês contam 1 avo). A 1ª parcela é metade, sem INSS e IR; na 2ª parcela descontam INSS e IR sobre o 13º inteiro, mais a 1ª já paga. FGTS de 8% em cada parcela.'};
+const IRL=(ir,lbl)=>{const L=[[lbl+(ir.simp?' (desconto simplificado)':''),'− '+brl(ir.v),'neg']];if(ir.red)L.push(['  redução Lei 15.270 já aplicada',brl(ir.red)]);return L};
+const FX=(im,ir)=>im.f.filter(x=>x[3]>0).map(([lo,hi,a,part,v])=>[nf(a*100,1)+'% sobre '+brl(part),brl(v)]).concat(ir?[['IR pela tabela: base '+brl(ir.base)+' × '+nf(ir.a*100,1)+'% (antes da redução)',brl(ir.tab)]]:[]);
+function irrfOpt(trib,ins,dep,simp){const r=irrf(trib,ins,dep);if(simp!==false||!r.simp)return r;
+ const b1=Math.max(0,trib-ins-dep*IRDEP),t1=irTab(b1);let red=0;if(trib<=5000)red=Math.min(t1.v,312.89);else if(trib<=7350)red=Math.min(t1.v,Math.max(0,r2(978.62-0.133145*trib)));return{base:b1,a:t1.a,tab:t1.v,red,v:r2(t1.v-red),simp:false}}
+function calcD(){
+ const mo=$('#d-mo').value||'m';$$('#d-ms button').forEach(x=>x.classList.toggle('on',x.dataset.v===mo));$$('[data-calc="folha"] [data-m]').forEach(el=>el.hidden=el.dataset.m!==mo);
+ $('#d-adl').textContent=mo==='m'?'Adicionais tributáveis (R$)':'Média de variáveis (R$)';$('#d-nt').textContent=NT[mo];
+ const sb=num($('#d-s').value)||0,ad=num($('#d-ad').value)||0,dep=Math.max(0,Math.floor(num($('#d-dp').value)||0)),nm=$('#d-n').value.trim();
+ let L=[],F=[],liq=0,lb='',sub='';
+ if(mo==='m'){
+  dxSync();const aj=num($('#d-aj').value)||0,VL=VALES.map(([k,l])=>[l,num($('#d-'+k).value)||0]).concat(DX.map(r=>[String(r.n||'Outro desconto'),num(r.v)||0])).filter(x=>x[1]),ou=r2(VL.reduce((a,x)=>a+x[1],0)),fa=Math.max(0,num($('#d-fa').value)||0),dsr=Math.max(0,num($('#d-dsr').value)||0),rj=(num($('#d-rj').value)||0)/100,rm=Math.max(0,Math.floor(num($('#d-rm').value)||0));
+  const sn=r2(sb*(1+rj)),dif=r2(sn-sb),ret=r2(dif*rm),dfa=r2(sn/30*(fa+dsr));
+  const jh=num($('#d-jh').value)||220,vh=sn/jh,h50=hrs($('#d-h50').value),h100=hrs($('#d-h100').value),fh=hrs($('#d-fh').value),du=num($('#d-du').value)||0,dd=num($('#d-dd').value)||0;
+  const v50=r2(vh*1.5*h50),v100=r2(vh*2*h100),dsrHE=du?r2((v50+v100)/du*dd):0,vfh=r2(vh*fh),he=v50+v100+dsrHE;
+  $('#d-vh').value=sn?brl(vh)+' · 50%: '+brl(vh*1.5)+' · 100%: '+brl(vh*2):'';
+  const bm=Math.max(0,sn+ad+he-dfa-vfh),im=inss(bm),iNew=im.t,iRet=r2((inss(sn+ad).t-inss(sb+ad).t)*rm),iT=r2(iNew+iRet);
+  const trib=bm+ret,ir=irrf(trib,iT,dep);
+  const prov=r2(sn+ad+he+ret+aj),desc=r2(dfa+vfh+iT+ir.v+ou),fg=r2((bm+ret)*.08);liq=r2(prov-desc);
+  L.push(['Salário base',brl(sb)]);
+  if(rj)L.push(['Reajuste de '+nf(rj*100)+'% por mês','+ '+brl(dif),'pos'],['Salário reajustado',brl(sn)]);
+  if(v50)L.push(['Horas extras 50% ('+hfmt(h50)+')',brl(v50),'pos']);
+  if(v100)L.push(['Horas extras 100% ('+hfmt(h100)+')',brl(v100),'pos']);
+  if(dsrHE)L.push(['DSR sobre horas extras',brl(dsrHE),'pos']);
+  if(ad)L.push(['Adicionais tributáveis',brl(ad)]);
+  if(ret)L.push(['Retroativo ('+rm+' '+(rm===1?'mês':'meses')+')',brl(ret),'pos']);
+  if(aj)L.push(['Ajuda de custo (sem INSS/IR/FGTS)',brl(aj)]);
+  L.push(['Total de proventos',brl(prov)]);
+  if(dfa)L.push(['Faltas: '+nf(fa,0)+' dia(s)'+(dsr?' + '+nf(dsr,0)+' DSR':''),'− '+brl(dfa),'neg']);
+  if(vfh)L.push(['Atrasos e saídas ('+hfmt(fh)+')','− '+brl(vfh),'neg']);
+  L.push(['INSS do mês ('+nf(bm?iNew/bm*100:0)+'% efetivo)','− '+brl(iNew),'neg']);
+  if(iRet)L.push(['INSS sobre o retroativo','− '+brl(iRet),'neg']);
+  L.push(...IRL(ir,'IRRF'));
+  VL.forEach(([l,v])=>L.push([l,'− '+brl(v),'neg']));$('#d-vt').textContent=ou?'Total de vales e descontos: '+brl(ou):'';
+  L.push(['Total de descontos','− '+brl(desc),'neg'],['Líquido',brl(liq),'pos'],['FGTS 8% (depósito da empresa)',brl(fg)],['Custo p/ empresa (sem encargos patronais)',brl(prov+fg)]);
+  F=FX(im,ir);lb='Salário líquido a receber';sub='Proventos '+brl(prov)+' − descontos '+brl(desc)}
+ else if(mo==='f'){
+  const dias=Math.max(0,Math.min(30,num($('#d-fd').value)||0)),vende=$('#d-fv').value==='s',rem=sb+ad;
+  const ftm=num($('#d-ft').value),a13=Math.max(0,num($('#d-fa13').value)||0),fe=r2(rem/30*dias),te=isFinite(ftm)&&ftm>=0?r2(ftm):r2(fe/3),ab=vende?r2(rem/30*10):0,ta=r2(ab/3);
+  const im=inss(fe+te),ir=irrfOpt(fe+te,im.t,dep,false),fg=r2((fe+te+a13)*.08);
+  const prov=r2(fe+te+ab+ta+a13),desc=r2(im.t+ir.v);liq=r2(prov-desc);
+  L.push(['Remuneração base (salário + média)',brl(rem)],['Férias ('+nf(dias,0)+' dias)',brl(fe)],['1/3 constitucional'+(isFinite(ftm)&&ftm>=0?' (manual)':''),brl(te)]);
+  if(vende)L.push(['Abono pecuniário (10 dias vendidos)',brl(ab)],['1/3 sobre o abono',brl(ta)]);
+  if(a13)L.push(['Adiantamento do 13º (sem INSS/IR agora)',brl(a13),'pos']);
+  L.push(['Total bruto',brl(prov)],['INSS sobre férias + 1/3','− '+brl(im.t),'neg'],...IRL(ir,'IRRF das férias'),['Total de descontos','− '+brl(desc),'neg'],['Líquido das férias',brl(liq),'pos'],['FGTS 8% (depósito da empresa)',brl(fg)]);
+  F=FX(im,ir);lb='Férias líquidas a receber';sub='Pagar até 2 dias antes do início das férias'}
+ else{
+  const av=Math.max(0,Math.min(12,Math.floor(num($('#d-13a').value)||0))),pc=$('#d-13p').value,rem=sb+ad,tot=r2(rem/12*av),p1=r2(tot/2);
+  const im=inss(tot),ir=irrfOpt(tot,im.t,dep,false);
+  L.push(['Remuneração base (salário + média)',brl(rem)],['13º integral ('+av+'/12 avos)',brl(tot)]);
+  if(pc==='1'){liq=p1;L.push(['1ª parcela (50%)',brl(p1),'pos'],['INSS e IR','descontados na 2ª parcela'],['FGTS 8% (depósito da empresa)',brl(r2(p1*.08))]);F=[];lb='1ª parcela a receber';sub='Sem descontos'}
+  else{const adm=num($('#d-13ad').value),ad1=isFinite(adm)&&adm>=0?r2(adm):(pc==='2'?p1:0),desc=r2(im.t+ir.v+ad1);liq=r2(tot-desc);
+   L.push(['INSS sobre o 13º','− '+brl(im.t),'neg'],...IRL(ir,'IRRF sobre o 13º (exclusivo na fonte)'));
+   if(ad1)L.push([isFinite(adm)&&adm>=0?'Adiantamento já recebido':'1ª parcela já paga','− '+brl(ad1),'neg']);
+   L.push(['Total de descontos','− '+brl(desc),'neg'],[pc==='2'||ad1?'Líquido da 2ª parcela':'Líquido do 13º',brl(liq),'pos'],['FGTS 8% (depósito da empresa)',brl(r2((tot-ad1)*.08))]);
+   F=FX(im,ir);lb=pc==='2'||ad1?'2ª parcela a receber':'13º líquido a receber';sub='13º bruto '+brl(tot)}}
+ $('#d-lb').textContent=lb;$('#d-res').textContent=sb?brl(liq):'—';$('#d-sub').textContent=sb?sub:'Informe o salário base';
+ rows($('#d-t'),L);rows($('#d-f'),F);
+ DS=`${{m:'Folha mensal',f:'Férias',t:'13º salário'}[mo]} ${nm||''} — ${new Date().toLocaleDateString('pt-BR')}\n`+L.map(([a,b])=>a.trim()+': '+b).join('\n')}
+$('#d-xa').addEventListener('click',()=>{dxSync();DX.push({n:'',v:''});dxPut();dxList();const n=document.getElementById('dxn'+(DX.length-1));if(n)n.focus()});
+$('#d-xl').addEventListener('input',e=>{const el=e.target;if(el.dataset.xi==null)return;DX[+el.dataset.xi][el.dataset.xk]=el.value;dxPut()});
+$('#d-xl').addEventListener('click',e=>{const b=e.target.closest('[data-xd]');if(!b)return;DX.splice(+b.dataset.xd,1);dxPut();dxList()});
+$('#d-ms').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#d-mo').value=b.dataset.v;calcD();save()});
+$('#d-copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(DS);$('#d-cmsg').textContent='Copiado!'}catch(e){$('#d-cmsg').textContent='Não foi possível copiar aqui'}setTimeout(()=>$('#d-cmsg').textContent='',2500)});
+/* ---- Financiamento ---- */
+let FS='';
+const pv=(r,pm,n)=>r?pm*(1-Math.pow(1+r,-n))/r:pm*n;
+function rateOf(pres,flows){let lo=0,hi=1;const f=r=>flows.reduce((a,c,k)=>a+c/Math.pow(1+r,k+1),0)-pres;if(f(0)<=0)return f(0)===0?0:NaN;for(let k=0;k<200;k++){const m=(lo+hi)/2;if(f(m)>0)lo=m;else hi=m}return(lo+hi)/2}
+const addM=(s,k)=>{if(!s)return'';const d=new Date(s+'T12:00:00'),day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+k);const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,last));return d.toISOString().slice(0,10)};
+function calcF(){
+ const mo=$('#p-mo').value||'n';$$('#p-ms button').forEach(x=>x.classList.toggle('on',x.dataset.v===mo));$$('[data-calc="custom"] [data-pm]').forEach(el=>el.hidden=el.dataset.pm!==mo);if(!$('[data-calc="custom"]').hidden)$('#cnote').hidden=mo!=='n';
+ const cm=$('#fi-c').value||'p';$$('#fi-cs button').forEach(x=>x.classList.toggle('on',x.dataset.v===cm));$$('[data-fc]').forEach(el=>el.hidden=el.dataset.fc!==cm);
+ if(mo!=='f')return;
+ const V=num($('#fi-v').value)||0,E=num($('#fi-e').value)||0,X=num($('#fi-x').value)||0,xf=$('#fi-xf').value==='f',n=Math.max(1,Math.min(600,Math.floor(num($('#fi-n').value)||0))),d1=$('#fi-d').value;
+ const lib=Math.max(0,V-E),P=lib+(xf?X:0),liqRec=lib-(xf?0:X);
+ let i,sys=$('#fi-s').value,S=[],L=[];
+ if(cm==='p'){const t=(num($('#fi-t').value)||0)/100;i=$('#fi-tp').value==='a'?Math.pow(1+t,1/12)-1:t}
+ else{sys='price';const pm=num($('#fi-pm').value)||0;i=P>0&&pm>0?rateOf(P,Array(n).fill(pm)):NaN}
+ if(!(P>0)||!isFinite(i)){$('#fi-res').textContent='—';$('#fi-sub').textContent=cm==='t'&&P>0?'Com essa parcela não há juros (parcela × prazo ≤ valor financiado).':'Preencha valor e prazo';rows($("#fi-tab"),[]);$('#fi-sch').innerHTML='';FS='';return}
+ let sal=P,tj=0,tp=0;const pmt=i?P*i/(1-Math.pow(1+i,-n)):P/n;
+ for(let k=1;k<=n;k++){const j=sal*i,am=sys==='sac'?P/n:pmt-j,pa=am+j;sal=Math.max(0,sal-am);tj+=j;tp+=pa;S.push([k,addM(d1,k-1),pa,j,am,sal])}
+ const cet=rateOf(liqRec,S.map(r=>r[2])),ia=Math.pow(1+i,12)-1;
+ if(cm==='t'){$('#fi-lb').textContent='Taxa de juros cobrada';$('#fi-res').textContent=nf(i*100,2)+'% a.m.';$('#fi-sub').textContent=nf(ia*100,2)+'% ao ano · parcela de '+brl(pmt)}
+ else{$('#fi-lb').textContent=sys==='sac'?'1ª parcela (SAC)':'Parcela mensal';$('#fi-res').textContent=brl(S[0][2]);$('#fi-sub').textContent=sys==='sac'?'Diminui até '+brl(S[n-1][2])+' na última':n+' parcelas iguais'}
+ L.push(['Valor do bem / empréstimo',brl(V)]);if(E)L.push(['Entrada','− '+brl(E)]);if(X)L.push(['IOF, tarifas e seguros',(xf?'+ ':'')+brl(X)+(xf?' (financiado)':' (à vista)')]);
+ L.push(['Valor financiado',brl(P)],['Taxa',nf(i*100,4)+'% a.m. · '+nf(ia*100,2)+'% a.a.'],['Prazo',n+' meses · '+(sys==='sac'?'SAC':'Price')],['Total das parcelas',brl(tp)],['Total de juros',brl(tj),'neg']);
+ if(E||(!xf&&X))L.push(['Total pago com entrada'+(xf?'':' e custos'),brl(tp+E+(xf?0:X))]);
+ L.push(['Custo efetivo total (CET)',isFinite(cet)?nf(cet*100,2)+'% a.m. · '+nf((Math.pow(1+cet,12)-1)*100,2)+'% a.a.':'—']);
+ if(d1)L.push(['Última parcela',fd(S[n-1][1])]);
+ rows($("#fi-tab"),L);
+ $('#fi-sch').innerHTML='<thead><tr><th>Nº</th>'+(d1?'<th>Venc.</th>':'')+'<th>Parcela</th><th>Juros</th><th>Amortiz.</th><th>Saldo</th></tr></thead><tbody>'+S.map(r=>`<tr><td>${r[0]}</td>${d1?`<td>${fd(r[1])}</td>`:''}<td>${nf(r[2])}</td><td>${nf(r[3])}</td><td>${nf(r[4])}</td><td>${nf(r[5])}</td></tr>`).join('')+'</tbody>';
+ FS='Financiamento — '+new Date().toLocaleDateString('pt-BR')+'\n'+L.map(([a,b])=>a+': '+b).join('\n')+'\n'+($('#fi-lb').textContent+': '+$('#fi-res').textContent)}
+$('#p-ms').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#p-mo').value=b.dataset.v;calcF();save()});
+$('#fi-cs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#fi-c').value=b.dataset.v;calcF();save()});
+$('#fi-copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(FS);$('#fi-cmsg').textContent='Copiado!'}catch(e){$('#fi-cmsg').textContent='Não foi possível copiar aqui'}setTimeout(()=>$('#fi-cmsg').textContent='',2500)});
+function calcAll(){calcA();calcP();calcJ();calcX();calcD();calcF()}
+$$('[data-calc] input,[data-calc] select').forEach(el=>{el.addEventListener('input',()=>{calcAll();save()})});
+$$('[data-esq]').forEach(b=>b.addEventListener('click',()=>{const e=esqA();if(isFinite(e)){$('#'+b.dataset.esq).value=nf(e);calcAll();save()}}));
+const segs=(id,fn)=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$$(id+' button').forEach(x=>x.classList.toggle('on',x===b));fn(b.dataset.v);calcJ()});
+segs('#j-m',v=>jm=v);segs('#j-o',v=>jo=v);
+function presets(){const s=M?.selic;const ps=[['1% a.m.',1,'m'],['1,5% a.m.',1.5,'m'],['2% a.m.',2,'m']];if(s!=null)ps.unshift(['Selic '+nf(s)+'% a.a.',s,'a']);
+ $('#j-pre').innerHTML=ps.map(p=>`<button type="button" data-t="${p[1]}" data-p="${p[2]}">${p[0]}</button>`).join('')}
+$('#j-pre').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#j-t').value=nf(+b.dataset.t);$('#j-tp').value=b.dataset.p;calcJ();save()});
+
+/* ---- histórico ---- */
+let H=[],hdb=null,usr=null,hcur=null,hSub=false;
+const hoje=()=>new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
+const selTxt=id=>{const e=$('#'+id);return e.options[e.selectedIndex]?.text||''};
+function snap(c){const o={};$$('[data-calc="'+c+'"] input,[data-calc="'+c+'"] select').forEach(el=>{if(el.id&&el.dataset.i==null&&el.dataset.xi==null&&!el.readOnly)o[el.id]=el.value});if(c==='juros'){o._jm=jm;o._jo=jo}return o}
+function resumo(c){
+ if(c==='arroba')return{t:$('#a-q').value+' '+selTxt('a-un')+' · compra R$ '+$('#a-c').value+' → venda R$ '+$('#a-v').value,r:$('#a-res').textContent,s:$('#a-mg').textContent,ref:hoje()};
+ if(c==='custom'&&$('#p-mo').value==='f')return{t:'Financiamento · '+brl(num($('#fi-v').value)||0)+' em '+$('#fi-n').value+' meses',r:$('#fi-lb').textContent+': '+$('#fi-res').textContent,s:$('#fi-sub').textContent,ref:hoje()};
+ if(c==='custom')return{t:$('#p-q').value+' '+selTxt('p-qu')+' a '+$('#p-p').value+' '+selTxt('p-u'),r:$('#p-res').textContent,s:$('#p-us').textContent,ref:hoje()};
+ if(c==='juros')return{t:(jm==='c'?'Compostos':'Simples')+' · '+$('#j-v').value+' a '+$('#j-t').value+'% '+selTxt('j-tp')+' · '+$('#j-p').value+' '+selTxt('j-pu'),r:$('#j-res').textContent,s:$('#j-lb').textContent+' · '+$('#j-jr').textContent,ref:hoje()};
+ if(c==='folha')return{t:({m:'Folha',f:'Férias',t:'13º'}[$('#d-mo').value]||'Folha')+' · '+($('#d-n').value.trim()||'Funcionário')+' · salário R$ '+$('#d-s').value+(num($('#d-rj').value)?' · reajuste '+$('#d-rj').value+'%':''),r:$('#d-res').textContent,s:$('#d-sub').textContent,ref:hoje()};
+ const nm=$('#x-n').value||'FIDC',nfs=[...new Set(X.map(r=>r.nf).filter(Boolean))];let b=0;X.forEach(r=>{const v=num(r.valor);if(isFinite(v))b+=v});
+ return{t:'FIDC '+nm+' · '+X.length+' parcela(s)'+(nfs.length?' · NF '+nfs.join(', '):''),r:$('#x-res').textContent,s:'Bruto '+brl(b)+' · '+$('#x-jr').textContent,ref:$('#x-op').value||hoje(),fidc:nm,bruto:Math.round(b*100)/100,nfs:X.map(r=>({...r}))}}
+async function hSave(){const m=$('#h-msg');if(!hcur)return;if(!hdb){m.textContent='O histórico precisa da sua conta conectada.';return}
+ const z=resumo(hcur);m.textContent='Salvando…';
+ try{const d={tipo:hcur,em:new Date().toISOString(),ref:z.ref,titulo:z.t,res:z.r,sub:z.s,inputs:snap(hcur)};if(usr)d.por=await usr.id();
+  if(hcur==='fidc'){d.fidc=z.fidc;d.bruto=z.bruto;d.nfs=z.nfs}
+  await hdb.collection('historico').add(d);m.textContent='Salvo no histórico do seu departamento.'}
+ catch(e){m.textContent=e?.code==='invalid_argument'||e?.code==='permission_denied'?'Seu acesso é só de leitura: não dá para salvar.':'Não foi possível salvar agora. Tente de novo.'}
+ setTimeout(()=>m.textContent='',4000)}
+$('#h-save').addEventListener('click',hSave);
+function hMatch(h){if(hcur!=='fidc')return true;
+ const di=$('#h-di').value,df=$('#h-df').value,q=$('#h-q').value.trim(),por=$('#h-por').value;
+ if(di&&h.ref<di)return false;if(df&&h.ref>df)return false;if(!q)return true;
+ if(por==='nf')return(h.nfs||[]).some(r=>String(r.nf||'').toLowerCase().includes(q.toLowerCase()));
+ if(por==='fidc')return String(h.fidc||'').toLowerCase().includes(q.toLowerCase());
+ const n=num(q),vs=[h.bruto,...(h.nfs||[]).map(r=>num(r.valor))].filter(isFinite);
+ return vs.some(v=>(isFinite(n)&&Math.abs(v-n)<0.005)||nf(v).includes(q))}
+async function renderH(){const box=$('#hbox');box.hidden=!hcur;if(!hcur)return;
+ $('#h-fil').hidden=hcur!=='fidc';$('#h-q').placeholder={nf:'Ex.: 2614',fidc:'Ex.: SB',bruto:'Ex.: 95.846,37'}[$('#h-por').value];
+ if(!hdb){$('#h-cnt').textContent='Entre na sua conta para ver e salvar o histórico.';$('#h-list').innerHTML='';return}
+ const hd=$('#h-dep').value||'',all=H.filter(h=>h.tipo===hcur&&(!hd||h.depto===hd)),l=all.filter(hMatch);
+ $('#h-cnt').textContent=all.length?(l.length===all.length?all.length+' cálculo(s) salvo(s)':l.length+' de '+all.length+' cálculo(s) encontrados'):'Nenhum cálculo salvo ainda. Toque em “Salvar este cálculo”.';
+ let ps={};const ids=[...new Set(l.map(h=>h.por).filter(Boolean))];if(usr&&ids.length){try{ps=await usr.profiles(ids)||{}}catch(e){}}
+ $('#h-list').innerHTML=l.map(h=>{const quem=h.por?(ps[h.por]?.name||''):'';const em=new Date(h.em);const ems=isNaN(em)?'':em.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  return `<div class="hi"><div><b>${esc(h.titulo)}</b><div class="mut">${hcur==='fidc'?'Operação de '+fd(h.ref)+' · ':''}salvo ${esc(ems)}${quem?' por '+esc(quem):''}${h.depto&&window.GP?.perfil?.papel==='admin'?' · '+esc(h.depto):''}</div><div class="mut">${esc(h.sub)}</div></div>
+  <div class="r"><b>${esc(h.res)}</b><div class="a"><button type="button" data-ho="${esc(h.id)}">Abrir</button><button type="button" data-hd="${esc(h.id)}">Excluir</button></div></div></div>`}).join('')}
+['#h-di','#h-df','#h-q','#h-por','#h-dep'].forEach(i=>$(i).addEventListener('input',renderH));
+$('#h-clr').addEventListener('click',()=>{['#h-di','#h-df','#h-q'].forEach(i=>$(i).value='');renderH()});
+$('#h-list').addEventListener('click',async e=>{const o=e.target.closest('[data-ho]'),d=e.target.closest('[data-hd]');
+ if(o){const h=H.find(x=>x.id===o.dataset.ho);if(!h)return;const inp=h.inputs||{};for(const k in inp){if(k[0]==='_')continue;const el=document.getElementById(k);if(el)el.value=inp[k]}
+  if(h.tipo==='juros'){jm=inp._jm||'c';jo=inp._jo||'f';$$('#j-m button').forEach(b=>b.classList.toggle('on',b.dataset.v===jm));$$('#j-o button').forEach(b=>b.classList.toggle('on',b.dataset.v===jo))}
+  if(h.tipo==='fidc'&&Array.isArray(h.nfs)){X=h.nfs.map(r=>({nf:r.nf||'',venc:r.venc||'',valor:r.valor||''}));xsave();$('#x-ex').textContent='';xlist()}
+  calcAll();save();$('#h-msg').textContent='Cálculo aberto. Os valores foram colocados nos campos acima.';try{scrollTo({top:0,behavior:'smooth'})}catch(_){}setTimeout(()=>$('#h-msg').textContent='',4000)}
+ if(d&&hdb&&confirm('Excluir este cálculo do histórico do departamento?')){try{await hdb.collection('historico').doc(d.dataset.hd).delete()}catch(err){$('#h-msg').textContent='Não foi possível excluir (seu acesso pode ser só de leitura).'}}});
+(async()=>{try{usr=await claude.use('user')}catch(e){usr=null}})();
+(async()=>{try{hdb=await claude.use('db')}catch(e){hdb=null}if(!hdb){renderH();return}
+ hdb.collection('historico').orderBy('em','desc').limit(1000).onSnapshot(qs=>{H=qs.docs.map(d=>({id:d.id,...d.data()}));renderH()},()=>{$('#h-cnt').textContent='Histórico indisponível no momento.'})})();
+const CT={arroba:'Compra e venda por @',custom:'Personalizada',juros:'Juros',fidc:'Juros FIDC',folha:'Folha de pagamento · DP'};
+function openCalc(c){const ok=c&&CT[c];$('#ctop').hidden=!!ok;$('#cbar').hidden=!ok;$('#cnote').hidden=!(c==='arroba'||c==='custom');
+ $$('[data-calc]').forEach(d=>d.hidden=d.dataset.calc!==c);hcur=ok?c:null;$('#h-msg').textContent='';renderH();if(ok){$('#ctitle').textContent=CT[c];calcAll()}}
+const KEY='pluma-calc';
+function save(){try{const o={};$$('[data-calc] input,[data-calc] select').forEach(el=>{if(el.id&&el.dataset.i==null&&el.dataset.xi==null&&!el.readOnly)o[el.id]=el.value});localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
+try{const o=JSON.parse(localStorage.getItem(KEY)||'{}');for(const k in o){const el=document.getElementById(k);if(el)el.value=o[k]}}catch(e){}
+
+/* ---- navegação ---- */
+function route(){let v=(location.hash||'#mercado').slice(1);let sub=null;if(v.startsWith('calc-')){sub=v.slice(5);v='calculadoras'}
+ const ok=['mercado','noticias','calculadoras'].concat(window.GP?.perfil?.papel==='admin'?['equipe']:[]).includes(v)?v:'mercado';if(ok==='equipe')eqLoad();if(ok==='calculadoras'){openCalc(sub);try{scrollTo(0,0)}catch(e){}}
+ $$('section.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+ok));$$('nav.tabs a').forEach(a=>a.classList.toggle('on',a.dataset.v===ok));
+ if(ok==='mercado')['#ch-esq','#ch-ice','#ch-usd','#ch-eur','#ch-ibov','#ch-nasdaq','#ch-sp500'].forEach(i=>{const s=$(i);if(s._d)draw(s)})}
+addEventListener('hashchange',route);route();calcAll();presets();
+$('#u-d').value=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
+if(!$('#x-op').value){$('#x-op').value=$('#u-d').value;calcX()}
+
+/* ---- dados compartilhados ---- */
+function up(arr,d,v){arr=(arr||[]).filter(p=>p.d!==d);arr.push({d,v});arr.sort((a,b)=>a.d<b.d?-1:1);return arr.slice(-90)}
+$('#fup').addEventListener('submit',async e=>{e.preventDefault();const m=$('#u-msg');
+ if(!db||!M){m.textContent='Os dados compartilhados não estão disponíveis agora.';return}
+ const d=$('#u-d').value,ev=num($('#u-e').value),uv=num($('#u-u').value),rv=num($('#u-r').value),sv=num($('#u-s').value),ucv=num($('#u-uc').value),ufv=num($('#u-uf').value);
+ if(!d||![ev,uv,rv,sv,ucv,ufv].some(isFinite)){m.textContent='Preencha a data e pelo menos um valor.';return}
+ const n=JSON.parse(JSON.stringify(M));if(isFinite(ev))n.esalq=up(n.esalq,d,ev);if(isFinite(uv))n.usd=up(n.usd,d,uv);if(isFinite(rv))n.eur=up(n.eur,d,rv);if(isFinite(ucv)){n.usdCom=up(n.usdCom,d,ucv);n.fonte={...(n.fonte||{}),usdCom:'Comercial (manual)'}}if(isFinite(ufv))n.usdFut=up(n.usdFut,d,ufv);if(isFinite(sv)){n.selic=sv;n.selicData=d}
+ n.atualizado=fd(d)+' (manual)';m.textContent='Salvando…';
+ try{await db.doc('mercado/atual').set(n);m.textContent='Salvo. Todos da equipe já veem o novo valor.';['#u-e','#u-u','#u-r','#u-s','#u-uc','#u-uf'].forEach(i=>$(i).value='')}
+ catch(err){m.textContent=err?.code==='invalid_argument'?'Seu acesso é só de leitura. Peça ao dono do app para liberar edição.':'Não foi possível salvar agora. Tente de novo em instantes.'}});
+
+(async()=>{try{db=await claude.use('db')}catch(e){db=null}
+ if(!db){$('#upd').textContent='Entre na sua conta para ver as cotações';return}
+ const t=setTimeout(()=>{if(!M)$('#upd').textContent='Sem conexão com os dados ainda…'},10000);
+ db.doc('mercado/atual').onSnapshot(s=>{if(!s.metadata.fromCache)clearTimeout(t);if(s.exists){M=s.data();renderMercado();presets()}else $('#upd').textContent='Sem cotações salvas ainda'},()=>{clearTimeout(t);$('#upd').textContent='Cotações indisponíveis no momento'});
+ newsDay(ND);db.doc('noticias/atual').onSnapshot(s=>{N=s.exists?s.data():null;renderNews()},()=>{$('#nl').innerHTML='<p class="mut">Notícias indisponíveis no momento.</p>'})})();
+renderNews();
+(async()=>{try{mcp=await claude.use('mcp')}catch(e){mcp=null}if(mcp)$('#rf').hidden=false})();
+$('#rf').addEventListener('click',async()=>{const b=$('#rf'),m=$('#rfm');if(!mcp)return;b.disabled=true;m.hidden=false;m.textContent='Pedindo atualização…';
+ try{await mcp.callTool('Claude Code Remote','fire_trigger',{trigger_id:'trig_01Rmu76TNvbCuZkuR22gUmKx'});rfPend=true;m.textContent='Atualização pedida. Os números novos aparecem aqui sozinhos em 2 a 4 minutos.';setTimeout(()=>{if(rfPend){b.disabled=false}},240000)}
+ catch(e){b.disabled=false;const c=e&&e.code;
+  m.textContent=(c==='not_in_manifest'||c==='approval_required'||c==='consent_required')?'É preciso permitir o conector Claude Code Remote para este app: toque em Atualizar de novo e aceite.':(c==='needs_reauth'||c==='server_not_connected'||c==='selection_required')?'Conecte o Claude Code Remote em Configurações → Conectores do claude.ai.':c==='tool_error'?'Não deu para pedir a atualização: só o dono do app pode fazer isso.':c==='blocked_by_policy'?'Sua organização bloqueia essa ação.':(c==='not_granted'||c==='capability_disabled'||c==='capability_removed')?'Atualização manual indisponível nesta tela.':'Não foi possível pedir agora. Tente de novo em instantes.'}});
+/* ---- Garopaba: perfil, admin e equipe ---- */
+async function eqLoad(){const sb=window.GP?.sb;if(!sb||GP.perfil?.papel!=='admin')return;const {data,error}=await sb.from('perfis').select('*').order('status').order('nome');
+ if(error){$('#eq-l').innerHTML='<p class="mut">Não foi possível carregar a equipe.</p>';return}EQ=data;eqRender()}
+let EQ=[],eqF='pendente';
+function eqRender(){const cnt=s=>EQ.filter(p=>s==='todos'||p.status===s).length;
+ $('#eq-f').innerHTML=[['pendente','Aguardando'],['ativo','Liberados'],['bloqueado','Bloqueados'],['todos','Todos']].map(([k,l])=>`<button type="button" data-ef="${k}" class="${eqF===k?'on':''}">${l} (${cnt(k)})</button>`).join('');
+ const l=EQ.filter(p=>eqF==='todos'||p.status===eqF),me=GP.user.id;
+ $('#eq-l').innerHTML=l.length?l.map(p=>`<div class="eq"><div><b>${esc(p.nome)}</b> ${p.papel==='admin'?'<span class="badge a">admin</span>':''}<div class="mut">${esc(p.email||'')}</div></div>
+ <div><select data-ed="${p.id}" aria-label="Departamento de ${esc(p.nome)}">${DEPTOS.map(d=>`<option ${d===p.departamento?'selected':''}>${d}</option>`).join('')}</select> <span class="badge ${p.status[0]}">${{pendente:'aguardando',ativo:'liberado',bloqueado:'bloqueado'}[p.status]}</span></div>
+ <div class="acts">${p.status!=='ativo'?`<button type="button" class="pri" data-es="${p.id}" data-v="ativo">Liberar</button>`:''}${p.status!=='bloqueado'&&p.id!==me?`<button type="button" data-es="${p.id}" data-v="bloqueado">Bloquear</button>`:''}${p.id!==me?`<button type="button" data-ea="${p.id}" data-v="${p.papel==='admin'?'usuario':'admin'}">${p.papel==='admin'?'Tirar admin':'Tornar admin'}</button>`:''}</div></div>`).join(''):'<p class="mut">Ninguém nesta lista.</p>'}
+async function eqUpd(id,patch){const {error}=await GP.sb.from('perfis').update(patch).eq('id',id);$('#eq-m').textContent=error?'Não foi possível salvar: '+error.message:'Salvo.';setTimeout(()=>$('#eq-m').textContent='',3000);eqLoad()}
+$('#eq-f').addEventListener('click',e=>{const b=e.target.closest('[data-ef]');if(b){eqF=b.dataset.ef;eqRender()}});
+$('#eq-l').addEventListener('click',e=>{const s=e.target.closest('[data-es]'),a=e.target.closest('[data-ea]');if(s)eqUpd(s.dataset.es,{status:s.dataset.v});if(a)eqUpd(a.dataset.ea,{papel:a.dataset.v})});
+$('#eq-l').addEventListener('change',e=>{const d=e.target.closest('[data-ed]');if(d)eqUpd(d.dataset.ed,{departamento:d.value})});
+function gpSetup(){const p=GP.perfil;if(!p)return;const adm=p.papel==='admin';
+ $('#who').hidden=false;$('#who-t').innerHTML='<b>'+esc(p.nome.split(' ')[0])+'</b> · '+esc(p.departamento);$('#who-o').onclick=async()=>{await GP.sb.auth.signOut();location.hash='';location.reload()};
+ $('#nav-eq').hidden=!adm;$('#h-dl').textContent=adm?'(todos os departamentos)':'· '+p.departamento;
+ if(adm){$('#h-dep').hidden=false;$('#h-dep').innerHTML='<option value="">Todos os departamentos</option>'+DEPTOS.map(d=>`<option>${d}</option>`).join('')}
+ const det=$('#fup')?.closest('details');if(det)det.hidden=!adm;route()}
+if(window.GP?.perfil)gpSetup();else document.addEventListener('gp-ready',gpSetup);
+
+}
+</script>
+</body>
+</html>
