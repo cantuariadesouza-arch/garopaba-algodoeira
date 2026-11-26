@@ -7,6 +7,7 @@ App interno (cotações do algodão, notícias e calculadoras) com login por dep
 - `config.js` — URL e chave pública (publishable/anon) do Supabase.
 - `schema.sql` — tabelas e regras de acesso (rodar 1 vez).
 - `seed.sql` — cotações e notícias iniciais (26/11/2026).
+- `google-login.sql` — ajustes para login com Google (rodar depois do schema).
 - `manifest.json`, `icon*.png`, `icon.svg` — instalar como aplicativo no celular.
 
 ## Montagem
@@ -16,6 +17,11 @@ App interno (cotações do algodão, notícias e calculadoras) com login por dep
 4. Preencher `config.js` com Project URL e a chave publishable/anon.
 5. GitHub: repositório `cantuariadesouza-arch/garopaba-algodoeira` com estes arquivos; Pages → branch main, pasta raiz.
 6. O primeiro cadastro feito no app vira administrador liberado (fazer com o e-mail do Augusto).
+
+## Login com Google
+- Authentication → Sign In / Providers → Google: ativar com Client ID e Client Secret do Google Cloud.
+- No Google Cloud, a URI de redirecionamento autorizada é `https://ywdxhbpovouoaiyzvani.supabase.co/auth/v1/callback`.
+- Quem entra pelo Google escolhe nome e departamento no primeiro acesso e fica aguardando liberação.
 
 ## Regras de acesso
 - Cadastro: nome, departamento (Comercial, Financeiro, Contábil, Faturamento, Logística, Jurídico), e-mail e senha → fica "aguardando".
