@@ -100,6 +100,11 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:600;min-height:44px;d
 #cbar h2{margin-bottom:14px}
 @media(max-width:860px){.tiles,.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:380px){.tile{padding:14px}.tile b{font-size:15px}.tile i{width:40px;height:40px}}
+.calc[data-calc="adiant"]{grid-template-columns:1fr!important}.calc[data-calc="adiant"] .res{overflow-x:auto}#v-tab tr:first-child td{font:600 12px Inter;color:var(--mut)}#v-tab tr:last-child td{font-weight:700}
+.vwrap{overflow-x:auto;margin:14px -4px 0;padding:0 4px 4px;-webkit-overflow-scrolling:touch}
+#v-grid{min-width:1060px;font-size:13px}#v-grid th{font:600 12px Inter;color:var(--mut);text-align:left;padding:6px 4px;border-bottom:1px solid var(--line);white-space:nowrap}
+#v-grid td{padding:5px 4px;text-align:left;vertical-align:middle}#v-grid td.c{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}#v-grid input{min-height:38px;font-size:14px;padding:0 8px;border-radius:9px}
+#v-grid tfoot td{font-weight:700;border-top:2px solid var(--line);border-bottom:0;padding-top:10px}#v-grid .vx{min-height:34px;padding:0 10px}
 .xr{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #ffffff1f}.xr b{display:block;font-weight:600;white-space:nowrap}.xr span{display:block;font-size:13px;color:#a9c2b8}.xr div:last-child{text-align:right}
 .prow{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr) minmax(0,1.2fr) auto;gap:8px;align-items:end;padding:12px 0;border-bottom:1px solid var(--line)}
 .prow .x{min-height:46px;padding:0 12px}
@@ -292,6 +297,7 @@ Garopaba Algodoeira<small id="upd">Carregando dados…</small><button type="butt
 <a class="tile" href="#calc-juros"><i><svg viewBox="0 0 24 24"><path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg></i><b>Juros</b><span>Simples ou compostos, futuro ou presente</span></a>
 <a class="tile" href="#calc-fidc"><i><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h4"/></svg></i><b>Juros FIDC</b><span>Antecipação de notas fiscais</span></a>
 <a class="tile" href="#calc-folha"><i><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11h5M18.5 8.5v5"/></svg></i><b>Folha · DP</b><span>Salário, INSS, IRRF, FGTS e retroativo</span></a>
+<a class="tile" href="#calc-adiant"><i><svg viewBox="0 0 24 24"><path d="M4 12h12M12 8l4 4-4 4"/><path d="M20 5v14"/></svg></i><b>Adiantamento</b><span>Cliente ou fornecedor · juros pro rata por nota</span></a>
 </div></div>
 <div id="cbar" hidden><a class="back" href="#calculadoras">← Calculadoras</a><h2 id="ctitle"></h2></div>
 
@@ -368,6 +374,20 @@ Garopaba Algodoeira<small id="upd">Carregando dados…</small><button type="butt
 <div class="card res"><div class="lbl">Valor líquido a receber</div><div class="big num pos" id="x-res">—</div><div id="x-jr" class="lbl"></div><table id="x-tab"></table>
 <div id="x-rows" style="margin-top:14px"></div>
 <div class="mini" style="margin-top:14px"><button type="button" class="pri" id="x-copy">Copiar resumo</button><span class="lbl" id="x-cmsg" style="align-self:center"></span></div></div>
+</div>
+<div class="calc" data-calc="adiant" hidden>
+<div class="card"><p class="mut" style="margin-top:0">Juros simples por nota: juros pro rata = taxa ao mês ÷ 30 × dias; valor do juros = valor da nota × juros pro rata. Dias = vencimento − pagamento (pagamento antes do vencimento desconta; depois do vencimento acrescenta).</p><div class="form">
+<div class="f w"><label>Adiantamento de</label><div class="seg" id="v-ts" style="margin:0"><button type="button" data-v="c" class="on">Cliente</button><button type="button" data-v="f">Fornecedor</button></div><input type="hidden" id="v-tp" value="c"></div>
+<div class="f w"><label for="v-e">Nome da empresa</label><input id="v-e" placeholder="Cliente ou fornecedor"></div>
+<div class="f"><label for="v-t">Taxa padrão (% ao mês)</label><input id="v-t" inputmode="decimal" value="1,50"></div>
+<div class="f"><label for="v-pg">Data pgto. padrão</label><input id="v-pg" type="date"></div>
+</div>
+<h3 style="font-size:18px;margin:20px 0 0">Notas</h3>
+<div class="vwrap"><table id="v-grid"><thead><tr><th>Nota</th><th>Data venc.</th><th>Data pgto.</th><th>Dias</th><th>Taxa % a.m.</th><th>Juros pro rata</th><th>Valor nota (R$)</th><th>Vlr juros</th><th id="v-hf">Valor a receber</th><th></th></tr></thead><tbody id="v-body"></tbody><tfoot><tr id="v-tot"></tr></tfoot></table></div>
+<div class="mini" style="margin-top:12px"><button type="button" class="pri" id="v-add">+ Adicionar nota</button><button type="button" id="v-dup">Repetir última</button><button type="button" id="v-clr">Limpar tudo</button></div>
+<p class="note" id="v-ex"></p>
+</div>
+<div class="card res"><div class="lbl" id="v-lb">Total a receber</div><div class="big num pos" id="v-res">—</div><div id="v-sub" class="lbl"></div><table id="v-tab"></table></div>
 </div>
 <div class="calc" data-calc="folha" hidden>
 <div class="card"><div class="form">
@@ -557,6 +577,46 @@ function calcJ(){
  $('#j-lb').textContent=jo==='f'?'Valor futuro':'Valor presente';$('#j-res').textContent=isFinite(R)?brl(R):'—';
  $('#j-jr').textContent=isFinite(J)?(jo==='f'?'Juros de ':'Desconto de ')+brl(J):'';
  rows($('#j-tab'),[['Valor informado',brl(P)],['Taxa no período',nf((f-1)*100,4)+'%'],[tp==='m'?'Equivalente ao ano':'Equivalente ao mês',nf(eq*100,4)+'%'],['Prazo em '+(tp==='m'?'meses':'anos'),nf(n,3)],['Fórmula',jm==='c'?'P × (1 + i)ⁿ':'P × (1 + i × n)']])}
+/* ---- Adiantamento (cliente/fornecedor) ---- */
+const VK='garopaba-adiant';let V;try{V=JSON.parse(localStorage.getItem(VK)||'null')}catch(e){}
+if(!Array.isArray(V))V=[];
+const vsave=()=>{try{localStorage.setItem(VK,JSON.stringify(V))}catch(e){}};
+const vToday=()=>new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
+if(!$('#v-pg').value)$('#v-pg').value=vToday();
+const vNew=l=>({nf:'',venc:'',pg:(l&&l.pg)||$('#v-pg').value||vToday(),taxa:(l&&l.taxa)||$('#v-t').value||'',valor:''});
+if(!V.length)V.push(vNew());
+function vlist(){$('#v-body').innerHTML=V.map((r,i)=>`<tr data-r="${i}">
+<td><input data-xi="${i}" data-k="nf" inputmode="numeric" value="${esc(r.nf)}" aria-label="Nota ${i+1}" style="width:90px"></td>
+<td><input data-xi="${i}" data-k="venc" type="date" value="${esc(r.venc)}" aria-label="Data de vencimento ${i+1}" style="width:145px"></td>
+<td><input data-xi="${i}" data-k="pg" type="date" value="${esc(r.pg)}" aria-label="Data de pagamento ${i+1}" style="width:145px"></td>
+<td class="c" data-o="d">—</td>
+<td><input data-xi="${i}" data-k="taxa" inputmode="decimal" value="${esc(r.taxa)}" aria-label="Taxa ${i+1}" style="width:80px"></td>
+<td class="c" data-o="pr">—</td>
+<td><input data-xi="${i}" data-k="valor" inputmode="decimal" value="${esc(r.valor)}" aria-label="Valor da nota ${i+1}" style="width:130px"></td>
+<td class="c" data-o="j">—</td><td class="c" data-o="f"><b>—</b></td>
+<td><button type="button" class="vx" data-vdel="${i}" aria-label="Remover nota ${i+1}">✕</button></td></tr>`).join('')}
+function calcV(){const tp=$('#v-tp').value==='f'?'f':'c',FL=tp==='f'?'Valor a pagar':'Valor a receber',emp=$('#v-e').value.trim();
+ $$('#v-ts button').forEach(b=>b.classList.toggle('on',b.dataset.v===tp));$('#v-hf').textContent=FL;
+ let tv=0,tj=0,tf=0,sd=0,st=0,n=0;const R=[];
+ V.forEach((r,i)=>{const v=num(r.valor),t=num(r.taxa)/100,d=r.venc&&r.pg?Math.round((D(r.venc)-D(r.pg))/864e5):NaN,pr=isFinite(t)&&isFinite(d)?t/30*Math.abs(d):NaN,
+  j=isFinite(v)&&isFinite(pr)?Math.round(v*pr*100)/100:NaN,sg=d<0?1:-1,f=isFinite(j)?Math.round((v+sg*j)*100)/100:(isFinite(v)?v:NaN);
+  const tr=$('#v-body').querySelector(`tr[data-r="${i}"]`);if(tr){const o=k=>tr.querySelector(`[data-o="${k}"]`);
+   o('d').textContent=isFinite(d)?(d<0?d+' (atraso)':d):'—';o('pr').textContent=isFinite(pr)?nf(pr*100,4)+'%':'—';o('j').textContent=isFinite(j)?(sg<0?'− ':'+ ')+brl(j):'—';o('f').innerHTML='<b>'+(isFinite(f)?brl(f):'—')+'</b>'}
+  if(isFinite(v)){tv+=v;n++;if(isFinite(j)){tj+=sg*j;sd+=v*d;st+=v*t}tf+=isFinite(f)?f:v}
+  R.push({...r,v,t,d,pr,j:isFinite(j)?sg*j:NaN,f})});
+ const dm=tv?sd/tv:NaN,tm=tv?st/tv:NaN,pe=tv?Math.abs(tj)/tv:NaN;
+ $('#v-tot').innerHTML=`<td>Total (${n})</td><td></td><td></td><td class="c">${isFinite(dm)?nf(dm,0)+' méd.':'—'}</td><td class="c">${isFinite(tm)?nf(tm*100)+'% méd.':'—'}</td><td class="c">${isFinite(pe)?nf(pe*100,4)+'%':'—'}</td><td class="c">${brl(tv)}</td><td class="c">${(tj<=0?'− ':'+ ')+brl(Math.abs(tj))}</td><td class="c">${brl(tf)}</td><td></td>`;
+ $('#v-lb').textContent='Total '+(tp==='f'?'a pagar':'a receber')+(emp?' · '+emp:'');$('#v-res').textContent=n?brl(tf):'—';
+ $('#v-sub').textContent=n?`${tp==='f'?'Fornecedor':'Cliente'} · ${n} nota(s) · valor das notas ${brl(tv)} · juros ${(tj<=0?'− ':'+ ')+brl(Math.abs(tj))}`:'Preencha as datas e o valor das notas';
+ $('#v-tab').innerHTML=n?`<tr><td>Nota</td><td>Venc.</td><td>Pgto.</td><td>Dias</td><td>Taxa</td><td>Pro rata</td><td>Valor nota</td><td>Juros</td><td>${FL}</td></tr>`+R.filter(r=>isFinite(r.v)).map(r=>`<tr><td>${esc(r.nf||'-')}</td><td>${r.venc?fd(r.venc):'-'}</td><td>${r.pg?fd(r.pg):'-'}</td><td>${isFinite(r.d)?r.d:'-'}</td><td>${isFinite(r.t)?nf(r.t*100)+'%':'-'}</td><td>${isFinite(r.pr)?nf(r.pr*100,4)+'%':'-'}</td><td>${brl(r.v)}</td><td>${isFinite(r.j)?(r.j<0?'− ':'+ ')+brl(Math.abs(r.j)):'-'}</td><td>${brl(r.f)}</td></tr>`).join('')+`<tr><td>Total</td><td></td><td></td><td>${isFinite(dm)?nf(dm,0):'-'}</td><td>${isFinite(tm)?nf(tm*100)+'%':'-'}</td><td>${isFinite(pe)?nf(pe*100,4)+'%':'-'}</td><td>${brl(tv)}</td><td>${(tj<=0?'− ':'+ ')+brl(Math.abs(tj))}</td><td>${brl(tf)}</td></tr>`:''}
+$('#v-body').addEventListener('input',e=>{const el=e.target;if(el.dataset.xi==null)return;V[+el.dataset.xi][el.dataset.k]=el.value;vsave();calcV()});
+$('#v-body').addEventListener('click',e=>{const b=e.target.closest('[data-vdel]');if(!b)return;V.splice(+b.dataset.vdel,1);if(!V.length)V.push(vNew());vsave();vlist();calcV()});
+$('#v-add').addEventListener('click',()=>{V.push(vNew(V[V.length-1]));vsave();vlist();calcV();const r=$('#v-body').querySelector(`tr[data-r="${V.length-1}"] input`);if(r)r.focus()});
+$('#v-dup').addEventListener('click',()=>{const l=V[V.length-1];V.push(l?{...l}:vNew());vsave();vlist();calcV()});
+$('#v-clr').addEventListener('click',()=>{if(!confirm('Apagar todas as notas desta calculadora?'))return;V=[vNew()];vsave();vlist();calcV()});
+$('#v-ts').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#v-tp').value=b.dataset.v;calcV();save()});
+['#v-e','#v-t','#v-pg'].forEach(i=>$(i).addEventListener('input',()=>{calcV();save()}));
+vlist();
 /* ---- FIDC ---- */
 const XK='pluma-fidc',EX=[{nf:'2614',venc:'2027-02-01',valor:'95.846,37'},{nf:'2614',venc:'2027-02-10',valor:'95.847,00'},{nf:'2614',venc:'2027-02-22',valor:'95.847,00'}];
 let X;try{X=JSON.parse(localStorage.getItem(XK)||'null')}catch(e){}
@@ -711,7 +771,7 @@ function calcF(){
 $('#p-ms').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#p-mo').value=b.dataset.v;calcF();save()});
 $('#fi-cs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#fi-c').value=b.dataset.v;calcF();save()});
 $('#fi-copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(FS);$('#fi-cmsg').textContent='Copiado!'}catch(e){$('#fi-cmsg').textContent='Não foi possível copiar aqui'}setTimeout(()=>$('#fi-cmsg').textContent='',2500)});
-function calcAll(){calcA();calcP();calcJ();calcX();calcD();calcF()}
+function calcAll(){calcA();calcP();calcJ();calcX();calcD();calcF();calcV()}
 $$('[data-calc] input,[data-calc] select').forEach(el=>{el.addEventListener('input',()=>{calcAll();save()})});
 $$('[data-esq]').forEach(b=>b.addEventListener('click',()=>{const e=esqA();if(isFinite(e)){$('#'+b.dataset.esq).value=nf(e);calcAll();save()}}));
 const segs=(id,fn)=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$$(id+' button').forEach(x=>x.classList.toggle('on',x===b));fn(b.dataset.v);calcJ()});
@@ -726,6 +786,7 @@ const hoje=()=>new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
 const selTxt=id=>{const e=$('#'+id);return e.options[e.selectedIndex]?.text||''};
 function snap(c){const o={};$$('[data-calc="'+c+'"] input,[data-calc="'+c+'"] select').forEach(el=>{if(el.id&&el.dataset.i==null&&el.dataset.xi==null&&!el.readOnly)o[el.id]=el.value});if(c==='juros'){o._jm=jm;o._jo=jo}return o}
 function resumo(c){
+ if(c==='adiant'){const tp=$('#v-tp').value==='f'?'Fornecedor':'Cliente',e=$('#v-e').value.trim(),nn=V.filter(r=>isFinite(num(r.valor))).length;return{t:'Adiantamento '+tp+(e?' · '+e:'')+' · '+nn+' nota(s)'+(V.some(r=>r.nf)?' · NF '+[...new Set(V.map(r=>r.nf).filter(Boolean))].join(', '):''),r:$('#v-res').textContent,s:$('#v-sub').textContent,ref:hoje()}}
  if(c==='arroba')return{t:$('#a-q').value+' '+selTxt('a-un')+' · compra R$ '+$('#a-c').value+' → venda R$ '+$('#a-v').value,r:$('#a-res').textContent,s:$('#a-mg').textContent,ref:hoje()};
  if(c==='custom'&&$('#p-mo').value==='f')return{t:'Financiamento · '+brl(num($('#fi-v').value)||0)+' em '+$('#fi-n').value+' meses',r:$('#fi-lb').textContent+': '+$('#fi-res').textContent,s:$('#fi-sub').textContent,ref:hoje()};
  if(c==='custom')return{t:$('#p-q').value+' '+selTxt('p-qu')+' a '+$('#p-p').value+' '+selTxt('p-u'),r:$('#p-res').textContent,s:$('#p-us').textContent,ref:hoje()};
@@ -736,7 +797,7 @@ function resumo(c){
 async function hSave(){const m=$('#h-msg');if(!hcur)return;if(!hdb){m.textContent='O histórico precisa da sua conta conectada.';return}
  const z=resumo(hcur);m.textContent='Salvando…';
  try{const d={tipo:hcur,em:new Date().toISOString(),ref:z.ref,titulo:z.t,res:z.r,sub:z.s,inputs:snap(hcur)};if(usr)d.por=await usr.id();
-  if(hcur==='fidc'){d.fidc=z.fidc;d.bruto=z.bruto;d.nfs=z.nfs}
+  if(hcur==='fidc'){d.fidc=z.fidc;d.bruto=z.bruto;d.nfs=z.nfs}if(hcur==='adiant')d.notas=V.map(r=>({...r}));
   await hdb.collection('historico').add(d);m.textContent='Salvo no histórico do seu departamento.'}
  catch(e){m.textContent=e?.code==='invalid_argument'||e?.code==='permission_denied'?'Seu acesso é só de leitura: não dá para salvar.':'Não foi possível salvar agora. Tente de novo.'}
  setTimeout(()=>m.textContent='',4000)}
@@ -762,13 +823,14 @@ $('#h-clr').addEventListener('click',()=>{['#h-di','#h-df','#h-q'].forEach(i=>$(
 $('#h-list').addEventListener('click',async e=>{const o=e.target.closest('[data-ho]'),d=e.target.closest('[data-hd]');
  if(o){const h=H.find(x=>x.id===o.dataset.ho);if(!h)return;const inp=h.inputs||{};for(const k in inp){if(k[0]==='_')continue;const el=document.getElementById(k);if(el)el.value=inp[k]}
   if(h.tipo==='juros'){jm=inp._jm||'c';jo=inp._jo||'f';$$('#j-m button').forEach(b=>b.classList.toggle('on',b.dataset.v===jm));$$('#j-o button').forEach(b=>b.classList.toggle('on',b.dataset.v===jo))}
+  if(h.tipo==='adiant'&&Array.isArray(h.notas)){V=h.notas.map(r=>({nf:r.nf||'',venc:r.venc||'',pg:r.pg||'',taxa:r.taxa||'',valor:r.valor||''}));vsave();vlist()}
   if(h.tipo==='fidc'&&Array.isArray(h.nfs)){X=h.nfs.map(r=>({nf:r.nf||'',venc:r.venc||'',valor:r.valor||''}));xsave();$('#x-ex').textContent='';xlist()}
   calcAll();save();$('#h-msg').textContent='Cálculo aberto. Os valores foram colocados nos campos acima.';try{scrollTo({top:0,behavior:'smooth'})}catch(_){}setTimeout(()=>$('#h-msg').textContent='',4000)}
  if(d&&hdb&&confirm('Excluir este cálculo do histórico do departamento?')){try{await hdb.collection('historico').doc(d.dataset.hd).delete()}catch(err){$('#h-msg').textContent='Não foi possível excluir (seu acesso pode ser só de leitura).'}}});
 (async()=>{try{usr=await claude.use('user')}catch(e){usr=null}})();
 (async()=>{try{hdb=await claude.use('db')}catch(e){hdb=null}if(!hdb){renderH();return}
  hdb.collection('historico').orderBy('em','desc').limit(1000).onSnapshot(qs=>{H=qs.docs.map(d=>({id:d.id,...d.data()}));renderH()},()=>{$('#h-cnt').textContent='Histórico indisponível no momento.'})})();
-const CT={arroba:'Compra e venda por @',custom:'Personalizada',juros:'Juros',fidc:'Juros FIDC',folha:'Folha de pagamento · DP'};
+const CT={arroba:'Compra e venda por @',custom:'Personalizada',juros:'Juros',fidc:'Juros FIDC',folha:'Folha de pagamento · DP',adiant:'Adiantamento'};
 function openCalc(c){const ok=c&&CT[c];$('#ctop').hidden=!!ok;$('#cbar').hidden=!ok;$('#cnote').hidden=!(c==='arroba'||c==='custom');
  $$('[data-calc]').forEach(d=>d.hidden=d.dataset.calc!==c);hcur=ok?c:null;$('#h-msg').textContent='';renderH();if(ok){$('#ctitle').textContent=CT[c];calcAll()}}
 const KEY='pluma-calc';
@@ -850,7 +912,7 @@ function exData(){const k=exCard();if(!k)return null;const {c,card}=k,blocks=[];
  const quem=(window.GP?.perfil?.nome)||'';
  return{c,title:CT[c]||'Cálculo',det,head,big,sub,blocks,quem,data:new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}}
 function exText(d,fmt){const B=s=>fmt==='wa'?'*'+s+'*':s;const L=[B('Garopaba Algodoeira · '+d.title),d.det,'',B(d.head+': '+d.big)];if(d.sub)L.push(d.sub);
- d.blocks.filter(b=>!b.big).forEach(b=>{L.push('');if(b.cap)L.push(B(b.cap));b.rows.forEach(r=>L.push(r.filter(Boolean).join(': ')))});
+ d.blocks.filter(b=>!b.big).forEach(b=>{L.push('');if(b.cap)L.push(B(b.cap));b.rows.forEach(r=>L.push(r.filter(Boolean).join(r.length>2?' · ':': ')))});
  if(d.blocks.some(b=>b.big))L.push('','(tabela completa no PDF ou Excel)');
  L.push('','Calculado em '+d.data+(d.quem?' por '+d.quem:''));return L.join('\n').replace(/\n{3,}/g,'\n\n')}
 const exFile=d=>('garopaba-'+d.c+'-'+new Date().toISOString().slice(0,10)).replace(/[^a-z0-9-]/gi,'');
