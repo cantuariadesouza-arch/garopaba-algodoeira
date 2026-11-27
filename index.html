@@ -396,9 +396,13 @@ Garopaba Algodoeira<small id="upd">Carregando dados…</small><button type="butt
 <div class="f"><label for="d-rj">Reajuste / dissídio (%)</label><input id="d-rj" inputmode="decimal" value="0"></div>
 <div class="f"><label for="d-rm">Meses de retroativo</label><input id="d-rm" inputmode="numeric" value="0"></div>
 </div></div>
+<div><h3 style="font-size:18px;margin:20px 0 4px">Pensão alimentícia</h3><p class="mut" style="margin:0 0 10px">Percentual da decisão judicial ou do acordo. Deixe 0 se não houver.</p><div class="form">
+<div class="f"><label for="d-pp">Pensão alimentícia (%)</label><input id="d-pp" inputmode="decimal" value="0"></div>
+<div class="f"><label for="d-pb">Calcular sobre</label><select id="d-pb"><option value="b">Salário bruto</option><option value="l">Salário líquido</option></select></div>
+</div><p class="mut" id="d-pi" style="margin:8px 0 0">Bruto = total dos proventos tributáveis (sem ajuda de custo). Líquido = bruto − INSS − IRRF. A pensão é deduzida da base do IR, como manda a lei.</p></div>
 <p class="note" id="d-nt"></p>
 </div>
-<div class="card res"><div class="lbl" id="d-lb">Salário líquido a receber</div><div class="big num pos" id="d-res">—</div><div id="d-sub" class="lbl"></div><table id="d-t"></table>
+<div class="card res"><div class="lbl" id="d-lb">Salário líquido a receber</div><div class="big num pos" id="d-res">—</div><div id="d-sub" class="lbl"></div><div id="d-pen" hidden style="margin:10px 0 2px;padding:10px 12px;border-radius:10px;background:#ffffff12;font-size:15px"></div><table id="d-t"></table>
 <div class="lbl" style="margin:14px 0 4px">INSS por faixa e IR</div><table id="d-f"></table>
 <div class="mini" style="margin-top:14px"><button type="button" class="pri" id="d-copy">Copiar holerite</button><span class="lbl" id="d-cmsg" style="align-self:center"></span></div></div>
 </div>
@@ -576,7 +580,7 @@ const IRT=[[2428.80,0,0],[2826.65,.075,182.16],[3751.05,.15,394.16],[4664.68,.22
 const r2=v=>Math.round(v*100+1e-6)/100;
 function inss(b){let t=0,lo=0;const f=[];for(const [hi,a] of INSS){const part=Math.max(0,Math.min(b,hi)-lo);const v=part*a;f.push([lo,hi,a,part,r2(v)]);t+=v;lo=hi;if(b<=hi)break}return{t:r2(t),f}}
 function irTab(b){for(const [hi,a,d] of IRT)if(b<=hi)return{a,v:Math.max(0,r2(b*a-d))}}
-function irrf(trib,ins,dep){const b1=Math.max(0,trib-ins-dep*IRDEP),b2=Math.max(0,trib-IRSIMP);const t1=irTab(b1),t2=irTab(b2);const s=t2.v<t1.v;const base=s?b2:b1,tb=s?t2:t1;
+function irrf(trib,ins,dep,pen=0){const b1=Math.max(0,trib-ins-dep*IRDEP-pen),b2=Math.max(0,trib-IRSIMP);const t1=irTab(b1),t2=irTab(b2);const s=t2.v<t1.v;const base=s?b2:b1,tb=s?t2:t1;
  let red=0;if(trib<=5000)red=Math.min(tb.v,312.89);else if(trib<=7350)red=Math.min(tb.v,Math.max(0,r2(978.62-0.133145*trib)));
  return{base,a:tb.a,tab:tb.v,red,v:r2(tb.v-red),simp:s}}
 const VALES=[["vale", "Vale (adiantamento)"], ["cfgts", "Empréstimo consignado FGTS"], ["cmed", "Convênio médico"], ["codo", "Convênio odontológico"], ["comb", "Combustível"], ["emp", "Empréstimo"], ["farm", "Farmácia"], ["ou", "Outros descontos"]];
@@ -592,13 +596,20 @@ const NT={m:'Faltas descontam salário ÷ 30 por dia (e o DSR perdido). Retroati
  t:'13º = (salário + média de variáveis) ÷ 12 × meses trabalhados (15 dias ou mais no mês contam 1 avo). A 1ª parcela é metade, sem INSS e IR; na 2ª parcela descontam INSS e IR sobre o 13º inteiro, mais a 1ª já paga. FGTS de 8% em cada parcela.'};
 const IRL=(ir,lbl)=>{const L=[[lbl+(ir.simp?' (desconto simplificado)':''),'− '+brl(ir.v),'neg']];if(ir.red)L.push(['  redução Lei 15.270 já aplicada',brl(ir.red)]);return L};
 const FX=(im,ir)=>im.f.filter(x=>x[3]>0).map(([lo,hi,a,part,v])=>[nf(a*100,1)+'% sobre '+brl(part),brl(v)]).concat(ir?[['IR pela tabela: base '+brl(ir.base)+' × '+nf(ir.a*100,1)+'% (antes da redução)',brl(ir.tab)]]:[]);
-function irrfOpt(trib,ins,dep,simp){const r=irrf(trib,ins,dep);if(simp!==false||!r.simp)return r;
- const b1=Math.max(0,trib-ins-dep*IRDEP),t1=irTab(b1);let red=0;if(trib<=5000)red=Math.min(t1.v,312.89);else if(trib<=7350)red=Math.min(t1.v,Math.max(0,r2(978.62-0.133145*trib)));return{base:b1,a:t1.a,tab:t1.v,red,v:r2(t1.v-red),simp:false}}
+function irrfOpt(trib,ins,dep,simp,pen=0){const r=irrf(trib,ins,dep,pen);if(simp!==false||!r.simp)return r;
+ const b1=Math.max(0,trib-ins-dep*IRDEP-pen),t1=irTab(b1);let red=0;if(trib<=5000)red=Math.min(t1.v,312.89);else if(trib<=7350)red=Math.min(t1.v,Math.max(0,r2(978.62-0.133145*trib)));return{base:b1,a:t1.a,tab:t1.v,red,v:r2(t1.v-red),simp:false}}
+const PB={b:'bruto',l:'líquido'};
+function penCalc(bruto,ins,irf){const p=Math.max(0,Math.min(100,num($('#d-pp').value)||0))/100,mb=$('#d-pb').value==='l'?'l':'b';
+ let v=0,ir=irf(0),base=r2(bruto);if(!p||!bruto)return{p:0,mb,v:0,ir,base};
+ if(mb==='b'){v=r2(base*p);ir=irf(v)}
+ else for(let k=0;k<40;k++){base=Math.max(0,r2(bruto-ins-ir.v));const nv=r2(base*p);if(Math.abs(nv-v)<.005)break;v=nv;ir=irf(v)}
+ return{p,mb,v,ir,base}}
+const PNL=(PN,ir,txt)=>{const L=[];if(!PN.v)return L;L.push(['Pensão alimentícia ('+nf(PN.p*100)+'% do '+PB[PN.mb]+(txt||'')+': '+brl(PN.base)+')','− '+brl(PN.v),'neg']);if(!ir.simp)L.push(['  pensão já deduzida da base do IR','']);return L};
 function calcD(){
  const mo=$('#d-mo').value||'m';$$('#d-ms button').forEach(x=>x.classList.toggle('on',x.dataset.v===mo));$$('[data-calc="folha"] [data-m]').forEach(el=>el.hidden=el.dataset.m!==mo);
  $('#d-adl').textContent=mo==='m'?'Adicionais tributáveis (R$)':'Média de variáveis (R$)';$('#d-nt').textContent=NT[mo];
  const sb=num($('#d-s').value)||0,ad=num($('#d-ad').value)||0,dep=Math.max(0,Math.floor(num($('#d-dp').value)||0)),nm=$('#d-n').value.trim();
- let L=[],F=[],liq=0,lb='',sub='';
+ let L=[],F=[],liq=0,lb='',sub='',PN=null;
  if(mo==='m'){
   dxSync();const aj=num($('#d-aj').value)||0,VL=VALES.map(([k,l])=>[l,num($('#d-'+k).value)||0]).concat(DX.map(r=>[String(r.n||'Outro desconto'),num(r.v)||0])).filter(x=>x[1]),ou=r2(VL.reduce((a,x)=>a+x[1],0)),fa=Math.max(0,num($('#d-fa').value)||0),dsr=Math.max(0,num($('#d-dsr').value)||0),rj=(num($('#d-rj').value)||0)/100,rm=Math.max(0,Math.floor(num($('#d-rm').value)||0));
   const sn=r2(sb*(1+rj)),dif=r2(sn-sb),ret=r2(dif*rm),dfa=r2(sn/30*(fa+dsr));
@@ -606,8 +617,8 @@ function calcD(){
   const v50=r2(vh*1.5*h50),v100=r2(vh*2*h100),dsrHE=du?r2((v50+v100)/du*dd):0,vfh=r2(vh*fh),he=v50+v100+dsrHE;
   $('#d-vh').value=sn?brl(vh)+' · 50%: '+brl(vh*1.5)+' · 100%: '+brl(vh*2):'';
   const bm=Math.max(0,sn+ad+he-dfa-vfh),im=inss(bm),iNew=im.t,iRet=r2((inss(sn+ad).t-inss(sb+ad).t)*rm),iT=r2(iNew+iRet);
-  const trib=bm+ret,ir=irrf(trib,iT,dep);
-  const prov=r2(sn+ad+he+ret+aj),desc=r2(dfa+vfh+iT+ir.v+ou),fg=r2((bm+ret)*.08);liq=r2(prov-desc);
+  const trib=bm+ret;PN=penCalc(trib,iT,pen=>irrf(trib,iT,dep,pen));const ir=PN.ir;
+  const prov=r2(sn+ad+he+ret+aj),desc=r2(dfa+vfh+iT+ir.v+PN.v+ou),fg=r2((bm+ret)*.08);liq=r2(prov-desc);
   L.push(['Salário base',brl(sb)]);
   if(rj)L.push(['Reajuste de '+nf(rj*100)+'% por mês','+ '+brl(dif),'pos'],['Salário reajustado',brl(sn)]);
   if(v50)L.push(['Horas extras 50% ('+hfmt(h50)+')',brl(v50),'pos']);
@@ -621,31 +632,33 @@ function calcD(){
   if(vfh)L.push(['Atrasos e saídas ('+hfmt(fh)+')','− '+brl(vfh),'neg']);
   L.push(['INSS do mês ('+nf(bm?iNew/bm*100:0)+'% efetivo)','− '+brl(iNew),'neg']);
   if(iRet)L.push(['INSS sobre o retroativo','− '+brl(iRet),'neg']);
-  L.push(...IRL(ir,'IRRF'));
+  L.push(...IRL(ir,'IRRF'),...PNL(PN,ir));
   VL.forEach(([l,v])=>L.push([l,'− '+brl(v),'neg']));$('#d-vt').textContent=ou?'Total de vales e descontos: '+brl(ou):'';
   L.push(['Total de descontos','− '+brl(desc),'neg'],['Líquido',brl(liq),'pos'],['FGTS 8% (depósito da empresa)',brl(fg)],['Custo p/ empresa (sem encargos patronais)',brl(prov+fg)]);
   F=FX(im,ir);lb='Salário líquido a receber';sub='Proventos '+brl(prov)+' − descontos '+brl(desc)}
  else if(mo==='f'){
   const dias=Math.max(0,Math.min(30,num($('#d-fd').value)||0)),vende=$('#d-fv').value==='s',rem=sb+ad;
   const ftm=num($('#d-ft').value),a13=Math.max(0,num($('#d-fa13').value)||0),fe=r2(rem/30*dias),te=isFinite(ftm)&&ftm>=0?r2(ftm):r2(fe/3),ab=vende?r2(rem/30*10):0,ta=r2(ab/3);
-  const im=inss(fe+te),ir=irrfOpt(fe+te,im.t,dep,false),fg=r2((fe+te+a13)*.08);
-  const prov=r2(fe+te+ab+ta+a13),desc=r2(im.t+ir.v);liq=r2(prov-desc);
+  const im=inss(fe+te);PN=penCalc(fe+te+ab+ta,im.t,pen=>irrfOpt(fe+te,im.t,dep,false,pen));const ir=PN.ir,fg=r2((fe+te+a13)*.08);
+  const prov=r2(fe+te+ab+ta+a13),desc=r2(im.t+ir.v+PN.v);liq=r2(prov-desc);
   L.push(['Remuneração base (salário + média)',brl(rem)],['Férias ('+nf(dias,0)+' dias)',brl(fe)],['1/3 constitucional'+(isFinite(ftm)&&ftm>=0?' (manual)':''),brl(te)]);
   if(vende)L.push(['Abono pecuniário (10 dias vendidos)',brl(ab)],['1/3 sobre o abono',brl(ta)]);
   if(a13)L.push(['Adiantamento do 13º (sem INSS/IR agora)',brl(a13),'pos']);
-  L.push(['Total bruto',brl(prov)],['INSS sobre férias + 1/3','− '+brl(im.t),'neg'],...IRL(ir,'IRRF das férias'),['Total de descontos','− '+brl(desc),'neg'],['Líquido das férias',brl(liq),'pos'],['FGTS 8% (depósito da empresa)',brl(fg)]);
+  L.push(['Total bruto',brl(prov)],['INSS sobre férias + 1/3','− '+brl(im.t),'neg'],...IRL(ir,'IRRF das férias'),...PNL(PN,ir,' das férias'),['Total de descontos','− '+brl(desc),'neg'],['Líquido das férias',brl(liq),'pos'],['FGTS 8% (depósito da empresa)',brl(fg)]);
   F=FX(im,ir);lb='Férias líquidas a receber';sub='Pagar até 2 dias antes do início das férias'}
  else{
   const av=Math.max(0,Math.min(12,Math.floor(num($('#d-13a').value)||0))),pc=$('#d-13p').value,rem=sb+ad,tot=r2(rem/12*av),p1=r2(tot/2);
-  const im=inss(tot),ir=irrfOpt(tot,im.t,dep,false);
+  const im=inss(tot);PN=penCalc(tot,im.t,pen=>irrfOpt(tot,im.t,dep,false,pen));const ir=PN.ir;
   L.push(['Remuneração base (salário + média)',brl(rem)],['13º integral ('+av+'/12 avos)',brl(tot)]);
-  if(pc==='1'){liq=p1;L.push(['1ª parcela (50%)',brl(p1),'pos'],['INSS e IR','descontados na 2ª parcela'],['FGTS 8% (depósito da empresa)',brl(r2(p1*.08))]);F=[];lb='1ª parcela a receber';sub='Sem descontos'}
-  else{const adm=num($('#d-13ad').value),ad1=isFinite(adm)&&adm>=0?r2(adm):(pc==='2'?p1:0),desc=r2(im.t+ir.v+ad1);liq=r2(tot-desc);
-   L.push(['INSS sobre o 13º','− '+brl(im.t),'neg'],...IRL(ir,'IRRF sobre o 13º (exclusivo na fonte)'));
+  if(pc==='1'){PN={...PN,base:p1,v:r2(p1*PN.p)};liq=r2(p1-PN.v);L.push(['1ª parcela (50%)',brl(p1),'pos'],...(PN.v?[['Pensão alimentícia ('+nf(PN.p*100)+'% da 1ª parcela: '+brl(p1)+')','− '+brl(PN.v),'neg']]:[]),['INSS e IR','descontados na 2ª parcela'],['FGTS 8% (depósito da empresa)',brl(r2(p1*.08))]);F=[];lb='1ª parcela a receber';sub=PN.v?'Sem INSS e IR; só a pensão':'Sem descontos'}
+  else{const adm=num($('#d-13ad').value),ad1=isFinite(adm)&&adm>=0?r2(adm):(pc==='2'?p1:0),pPrev=r2(ad1*PN.p),pAg=Math.max(0,r2(PN.v-pPrev));
+   L.push(['INSS sobre o 13º','− '+brl(im.t),'neg'],...IRL(ir,'IRRF sobre o 13º (exclusivo na fonte)'),...PNL(PN,ir,' do 13º'));
+   if(pPrev&&PN.v)L.push(['  pensão já paga na 1ª parcela','+ '+brl(Math.min(pPrev,PN.v)),'pos']);
+   PN={...PN,v:pAg};const desc=r2(im.t+ir.v+pAg+ad1);liq=r2(tot-desc);
    if(ad1)L.push([isFinite(adm)&&adm>=0?'Adiantamento já recebido':'1ª parcela já paga','− '+brl(ad1),'neg']);
    L.push(['Total de descontos','− '+brl(desc),'neg'],[pc==='2'||ad1?'Líquido da 2ª parcela':'Líquido do 13º',brl(liq),'pos'],['FGTS 8% (depósito da empresa)',brl(r2((tot-ad1)*.08))]);
    F=FX(im,ir);lb=pc==='2'||ad1?'2ª parcela a receber':'13º líquido a receber';sub='13º bruto '+brl(tot)}}
- $('#d-lb').textContent=lb;$('#d-res').textContent=sb?brl(liq):'—';$('#d-sub').textContent=sb?sub:'Informe o salário base';
+ $('#d-lb').textContent=lb;$('#d-res').textContent=sb?brl(liq):'—';{const pe=$('#d-pen'),pv=sb&&PN&&PN.v?PN.v:0;pe.hidden=!pv;pe.innerHTML=pv?'Pensão alimentícia: <b>'+brl(pv)+'</b><br><span class="mut" style="font-size:13px">Valor separado do salário, para o beneficiário. Já foi descontado do líquido acima.</span>':'';if(pv)L.push(['Pensão alimentícia a repassar',brl(pv)])}$('#d-sub').textContent=sb?sub:'Informe o salário base';
  rows($('#d-t'),L);rows($('#d-f'),F);
  DS=`${{m:'Folha mensal',f:'Férias',t:'13º salário'}[mo]} ${nm||''} — ${new Date().toLocaleDateString('pt-BR')}\n`+L.map(([a,b])=>a.trim()+': '+b).join('\n')}
 $('#d-xa').addEventListener('click',()=>{dxSync();DX.push({n:'',v:''});dxPut();dxList();const n=document.getElementById('dxn'+(DX.length-1));if(n)n.focus()});
@@ -703,7 +716,7 @@ function resumo(c){
  if(c==='custom'&&$('#p-mo').value==='f')return{t:'Financiamento · '+brl(num($('#fi-v').value)||0)+' em '+$('#fi-n').value+' meses',r:$('#fi-lb').textContent+': '+$('#fi-res').textContent,s:$('#fi-sub').textContent,ref:hoje()};
  if(c==='custom')return{t:$('#p-q').value+' '+selTxt('p-qu')+' a '+$('#p-p').value+' '+selTxt('p-u'),r:$('#p-res').textContent,s:$('#p-us').textContent,ref:hoje()};
  if(c==='juros')return{t:(jm==='c'?'Compostos':'Simples')+' · '+$('#j-v').value+' a '+$('#j-t').value+'% '+selTxt('j-tp')+' · '+$('#j-p').value+' '+selTxt('j-pu'),r:$('#j-res').textContent,s:$('#j-lb').textContent+' · '+$('#j-jr').textContent,ref:hoje()};
- if(c==='folha')return{t:({m:'Folha',f:'Férias',t:'13º'}[$('#d-mo').value]||'Folha')+' · '+($('#d-n').value.trim()||'Funcionário')+' · salário R$ '+$('#d-s').value+(num($('#d-rj').value)?' · reajuste '+$('#d-rj').value+'%':''),r:$('#d-res').textContent,s:$('#d-sub').textContent,ref:hoje()};
+ if(c==='folha')return{t:({m:'Folha',f:'Férias',t:'13º'}[$('#d-mo').value]||'Folha')+' · '+($('#d-n').value.trim()||'Funcionário')+' · salário R$ '+$('#d-s').value+(num($('#d-rj').value)?' · reajuste '+$('#d-rj').value+'%':''),r:$('#d-res').textContent,s:$('#d-sub').textContent+($('#d-pen').hidden?'':' · pensão '+brl(num(($('#d-pen b')||{}).textContent)||0)),ref:hoje()};
  const nm=$('#x-n').value||'FIDC',nfs=[...new Set(X.map(r=>r.nf).filter(Boolean))];let b=0;X.forEach(r=>{const v=num(r.valor);if(isFinite(v))b+=v});
  return{t:'FIDC '+nm+' · '+X.length+' parcela(s)'+(nfs.length?' · NF '+nfs.join(', '):''),r:$('#x-res').textContent,s:'Bruto '+brl(b)+' · '+$('#x-jr').textContent,ref:$('#x-op').value||hoje(),fidc:nm,bruto:Math.round(b*100)/100,nfs:X.map(r=>({...r}))}}
 async function hSave(){const m=$('#h-msg');if(!hcur)return;if(!hdb){m.textContent='O histórico precisa da sua conta conectada.';return}
