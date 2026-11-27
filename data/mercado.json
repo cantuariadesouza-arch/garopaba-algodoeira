@@ -1,5 +1,5 @@
 {
- "atualizado": "27/11/2026 17:09",
+ "atualizado": "27/11/2026 17:42",
  "esalq": [
   {
    "d": "2026-11-03",
@@ -257,7 +257,7 @@
    "v": 23585.8
   }
  ],
- "nota": "Dólar das 13h20 (último valor confirmado; fechamento ainda não divulgado); euro pela PTAX de hoje.",
+ "nota": "Dólar no fechamento de hoje; euro pela PTAX de hoje (fechamento comercial ainda não confirmado).",
  "selic": 13.75,
  "selicData": "2026-11-04",
  "sp500": [
@@ -317,7 +317,7 @@
   },
   {
    "d": "2026-11-27",
-   "v": 5.558
+   "v": 5.514
   }
  ],
  "usdCom": [
@@ -348,5 +348,5 @@
    "v": 5.7485
   }
  ],
- "verificado": "27/11 17:09"
+ "verificado": "27/11 17:42"
 }
