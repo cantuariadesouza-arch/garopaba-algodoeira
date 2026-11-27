@@ -1,1 +1,84 @@
-{"itens": [{"c": "Câmbio", "d": "2026-11-27", "f": "O Tempo", "r": "Moeda americana recuava 4,23%, a R$ 5,499, por volta das 10h15, e chegou à mínima de R$ 5,478 após confirmação de Trabuco.", "t": "Dólar despenca mais de 4% e toca R$ 5,48 com Trabuco na Fazenda", "u": "https://www.otempo.com.br/economia/2026/11/27/efeito-trabuco-dolar-cai-mais-de-4-no-dia-e-chega-a-r-5-48-bolsa-dispara-mais-uma-vez"}, {"c": "Algodão", "d": "2026-11-27", "f": "Pro Farmer", "r": "Contrato março subiu 127 pontos, a 84,24 ¢/lb, maior fechamento desde 22/10, com ganho de 495 pontos na semana.", "t": "Algodão em NY tem maior fechamento desde outubro em pregão curto", "u": "https://www.profarmer.com/news/after-bell/after-bell-soybeans-and-cotton-set-november-highs-holiday-shortened-session"}, {"c": "Algodão", "d": "2026-11-27", "f": "SAFRAS & Mercado", "r": "Algodão industrial em São Paulo subiu 1,43% na semana, a R$ 4,27/lp; exportações de novembro somam 266,8 mil toneladas.", "t": "Pluma brasileira acompanha alta de NY e negócios melhoram em novembro", "u": "https://safras.com.br/mercado-brasileiro-de-algodao-acompanha-alta-em-nova-york-e-registra-melhora-nos-negocios-em-novembro/"}, {"c": "Câmbio", "d": "2026-11-27", "f": "TradeMap", "r": "PTAX do dólar fechou a R$ 5,5430 (-3,51%) e a do euro a R$ 6,0646 (-3,80%) nesta sexta-feira.", "t": "PTAX do dólar e do euro despencam mais de 3,5%", "u": "https://trademap.com.br/noticias/news-8653167"}, {"c": "Algodão", "d": "2026-11-27", "f": "NX1", "r": "Primeira exportação da unidade de Santa Filomena (PI) somou 117 toneladas, com destino ao porto de Iskenderun.", "t": "SLC faz primeiro embarque de pluma da Fazenda Parnaguá para a Turquia", "u": "https://nx1.com.br/2026/11/27/slc-agricola-estreia-exportacao-de-algodao-da-fazenda-parnagua-com-117-toneladas-para-a-turquia/"}, {"c": "Economia", "d": "2026-11-27", "f": "InfoMoney", "r": "Agenda do dia combina repercussão da escolha de Trabuco para a Fazenda com dados de emprego e o IGP-M de novembro.", "t": "Sexta-feira tem Trabuco na Fazenda, desemprego e IGP-M no radar", "u": "https://www.infomoney.com.br/mercados/trabuco-fazenda-desemprego-igp-m-agenda-27112026/"}, {"c": "Economia", "d": "2026-11-26", "f": "BPMoney", "r": "Bolsa teve forte alta e dólar recuou 1,25% diante da expectativa de Luiz Carlos Trabuco no Ministério da Fazenda.", "t": "Ibovespa sobe 6,07% e fecha a 176.799 pontos com Trabuco no radar", "u": "https://bpmoney.com.br/mercado/ibovespa-dispara-607-dolar-cai-574-expectativa-trabuco-fazenda/"}, {"c": "Algodão", "d": "2026-11-26", "f": "Aquidauana Notícias / Cepea", "r": "Indicador Cepea/Esalq chegou a R$ 4,2797/lp em 25/11, alta de 3,62% no mês; à vista, R$ 4,2675/lp.", "t": "Pluma segue firme no Brasil, apoiada no dólar e nas exportações", "u": "https://aquidauananoticias.com.br/?p=27845"}, {"c": "Economia", "d": "2026-11-26", "f": "Money Times", "r": "IPCA-15 veio abaixo do esperado; no acumulado de 12 meses, o índice sobe 4,64%.", "t": "Prévia da inflação desacelera para 0,22% em novembro", "u": "https://www.moneytimes.com.br/ipca-15-desacelera-em-novembro-mas-sobe-464-em-12-meses/"}, {"c": "Economia", "d": "2026-11-26", "f": "InfoMoney", "r": "Lula discute PEC sobre despesas obrigatórias; Trump propõe tarifas a 14 parceiros, incluindo taxação sobre açúcar e aeronaves brasileiras.", "t": "Governo prepara PEC para conter gastos e reage a novas tarifas dos EUA", "u": "https://www.infomoney.com.br/mercados/ipca-15-debate-fiscal-feriado-eua-agenda-26112026/"}]}
+{
+  "itens": [
+    {
+      "c": "Câmbio",
+      "d": "2026-11-27",
+      "f": "O Tempo",
+      "r": "Moeda americana recuava 4,23%, a R$ 5,499, por volta das 10h15, e chegou à mínima de R$ 5,478 após confirmação de Trabuco.",
+      "t": "Dólar despenca mais de 4% e toca R$ 5,48 com Trabuco na Fazenda",
+      "u": "https://www.otempo.com.br/economia/2026/11/27/efeito-trabuco-dolar-cai-mais-de-4-no-dia-e-chega-a-r-5-48-bolsa-dispara-mais-uma-vez"
+    },
+    {
+      "c": "Algodão",
+      "d": "2026-11-27",
+      "f": "Pro Farmer",
+      "r": "Contrato março subiu 127 pontos, a 84,24 ¢/lb, maior fechamento desde 22/10, com ganho de 495 pontos na semana.",
+      "t": "Algodão em NY tem maior fechamento desde outubro em pregão curto",
+      "u": "https://www.profarmer.com/news/after-bell/after-bell-soybeans-and-cotton-set-november-highs-holiday-shortened-session"
+    },
+    {
+      "c": "Algodão",
+      "d": "2026-11-27",
+      "f": "SAFRAS & Mercado",
+      "r": "Algodão industrial em São Paulo subiu 1,43% na semana, a R$ 4,27/lp; exportações de novembro somam 266,8 mil toneladas.",
+      "t": "Pluma brasileira acompanha alta de NY e negócios melhoram em novembro",
+      "u": "https://safras.com.br/mercado-brasileiro-de-algodao-acompanha-alta-em-nova-york-e-registra-melhora-nos-negocios-em-novembro/"
+    },
+    {
+      "c": "Câmbio",
+      "d": "2026-11-27",
+      "f": "TradeMap",
+      "r": "PTAX do dólar fechou a R$ 5,5430 (-3,51%) e a do euro a R$ 6,0646 (-3,80%) nesta sexta-feira.",
+      "t": "PTAX do dólar e do euro despencam mais de 3,5%",
+      "u": "https://trademap.com.br/noticias/news-8653167"
+    },
+    {
+      "c": "Algodão",
+      "d": "2026-11-27",
+      "f": "NX1",
+      "r": "Primeira exportação da unidade de Santa Filomena (PI) somou 117 toneladas, com destino ao porto de Iskenderun.",
+      "t": "SLC faz primeiro embarque de pluma da Fazenda Parnaguá para a Turquia",
+      "u": "https://nx1.com.br/2026/11/27/slc-agricola-estreia-exportacao-de-algodao-da-fazenda-parnagua-com-117-toneladas-para-a-turquia/"
+    },
+    {
+      "c": "Economia",
+      "d": "2026-11-27",
+      "f": "InfoMoney",
+      "r": "Agenda do dia combina repercussão da escolha de Trabuco para a Fazenda com dados de emprego e o IGP-M de novembro.",
+      "t": "Sexta-feira tem Trabuco na Fazenda, desemprego e IGP-M no radar",
+      "u": "https://www.infomoney.com.br/mercados/trabuco-fazenda-desemprego-igp-m-agenda-27112026/"
+    },
+    {
+      "c": "Economia",
+      "d": "2026-11-26",
+      "f": "BPMoney",
+      "r": "Bolsa teve forte alta e dólar recuou 1,25% diante da expectativa de Luiz Carlos Trabuco no Ministério da Fazenda.",
+      "t": "Ibovespa sobe 6,07% e fecha a 176.799 pontos com Trabuco no radar",
+      "u": "https://bpmoney.com.br/mercado/ibovespa-dispara-607-dolar-cai-574-expectativa-trabuco-fazenda/"
+    },
+    {
+      "c": "Algodão",
+      "d": "2026-11-26",
+      "f": "Aquidauana Notícias / Cepea",
+      "r": "Indicador Cepea/Esalq chegou a R$ 4,2797/lp em 25/11, alta de 3,62% no mês; à vista, R$ 4,2675/lp.",
+      "t": "Pluma segue firme no Brasil, apoiada no dólar e nas exportações",
+      "u": "https://aquidauananoticias.com.br/?p=27845"
+    },
+    {
+      "c": "Economia",
+      "d": "2026-11-26",
+      "f": "Money Times",
+      "r": "IPCA-15 veio abaixo do esperado; no acumulado de 12 meses, o índice sobe 4,64%.",
+      "t": "Prévia da inflação desacelera para 0,22% em novembro",
+      "u": "https://www.moneytimes.com.br/ipca-15-desacelera-em-novembro-mas-sobe-464-em-12-meses/"
+    },
+    {
+      "c": "Economia",
+      "d": "2026-11-26",
+      "f": "InfoMoney",
+      "r": "Lula discute PEC sobre despesas obrigatórias; Trump propõe tarifas a 14 parceiros, incluindo taxação sobre açúcar e aeronaves brasileiras.",
+      "t": "Governo prepara PEC para conter gastos e reage a novas tarifas dos EUA",
+      "u": "https://www.infomoney.com.br/mercados/ipca-15-debate-fiscal-feriado-eua-agenda-26112026/"
+    }
+  ]
+}
