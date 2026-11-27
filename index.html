@@ -339,7 +339,7 @@ Garopaba Algodoeira<small id="upd">Carregando dados…</small><button type="butt
 <div class="f"><label for="j-pu">Unidade do prazo</label><select id="j-pu"><option value="d">dias corridos</option><option value="m">meses</option><option value="a">anos</option></select></div>
 <div class="f w mini" id="j-pre"></div>
 </div></div>
-<div class="card res"><div class="lbl" id="j-lb">Valor futuro</div><div class="big num" id="j-res">—</div><div id="j-jr" class="lbl"></div><table id="j-t"></table></div>
+<div class="card res"><div class="lbl" id="j-lb">Valor futuro</div><div class="big num" id="j-res">—</div><div id="j-jr" class="lbl"></div><table id="j-tab"></table></div>
 </div>
 <div class="calc" data-calc="fidc" hidden>
 <div class="card"><p class="mut" style="margin-top:0">Antecipação de notas no FIDC: juros simples = valor × taxa ao mês ÷ 30 × (prazo + float).</p><div class="form">
@@ -353,7 +353,7 @@ Garopaba Algodoeira<small id="upd">Carregando dados…</small><button type="butt
 <div class="mini" style="margin-top:12px"><button type="button" class="pri" id="x-add">+ Adicionar parcela</button><button type="button" id="x-dup">Repetir última</button><button type="button" id="x-clr">Limpar tudo</button></div>
 <p class="note" id="x-ex"></p>
 </div>
-<div class="card res"><div class="lbl">Valor líquido a receber</div><div class="big num pos" id="x-res">—</div><div id="x-jr" class="lbl"></div><table id="x-t"></table>
+<div class="card res"><div class="lbl">Valor líquido a receber</div><div class="big num pos" id="x-res">—</div><div id="x-jr" class="lbl"></div><table id="x-tab"></table>
 <div id="x-rows" style="margin-top:14px"></div>
 <div class="mini" style="margin-top:14px"><button type="button" class="pri" id="x-copy">Copiar resumo</button><span class="lbl" id="x-cmsg" style="align-self:center"></span></div></div>
 </div>
@@ -544,7 +544,7 @@ function calcJ(){
  const eq=tp==='m'?(jm==='c'?Math.pow(1+i,12)-1:i*12):(jm==='c'?Math.pow(1+i,1/12)-1:i/12);
  $('#j-lb').textContent=jo==='f'?'Valor futuro':'Valor presente';$('#j-res').textContent=isFinite(R)?brl(R):'—';
  $('#j-jr').textContent=isFinite(J)?(jo==='f'?'Juros de ':'Desconto de ')+brl(J):'';
- rows($('#j-t'),[['Valor informado',brl(P)],['Taxa no período',nf((f-1)*100,4)+'%'],[tp==='m'?'Equivalente ao ano':'Equivalente ao mês',nf(eq*100,4)+'%'],['Prazo em '+(tp==='m'?'meses':'anos'),nf(n,3)],['Fórmula',jm==='c'?'P × (1 + i)ⁿ':'P × (1 + i × n)']])}
+ rows($('#j-tab'),[['Valor informado',brl(P)],['Taxa no período',nf((f-1)*100,4)+'%'],[tp==='m'?'Equivalente ao ano':'Equivalente ao mês',nf(eq*100,4)+'%'],['Prazo em '+(tp==='m'?'meses':'anos'),nf(n,3)],['Fórmula',jm==='c'?'P × (1 + i)ⁿ':'P × (1 + i × n)']])}
 /* ---- FIDC ---- */
 const XK='pluma-fidc',EX=[{nf:'2614',venc:'2027-02-01',valor:'95.846,37'},{nf:'2614',venc:'2027-02-10',valor:'95.847,00'},{nf:'2614',venc:'2027-02-22',valor:'95.847,00'}];
 let X;try{X=JSON.parse(localStorage.getItem(XK)||'null')}catch(e){}
@@ -566,7 +566,7 @@ function calcX(){
  const liq=tv-tj,tef=tvp?tj/tvp*30:NaN,pm=tv?tvp/tv:NaN;
  $('#x-res').textContent=tv?brl(liq):'—';
  $('#x-jr').textContent=tv?'Juros de '+brl(tj)+' sobre '+brl(tv)+' em NFs':'Preencha vencimento e valor das parcelas';
- rows($('#x-t'),[['FIDC',esc(nm)],['Valor total das NFs',brl(tv)],['Juros total',brl(tj),'neg'],['Líquido total',brl(liq),'pos'],['Taxa nominal (com float)',nf(t*100)+'% a.m.'],['Taxa final efetiva',isFinite(tef)?nf(tef*100)+'% a.m.':'—'],['Prazo médio ponderado',isFinite(pm)?nf(pm,0)+' dias':'—'],['Float',nf(fl,0)+' dia(s)']]);
+ rows($('#x-tab'),[['FIDC',esc(nm)],['Valor total das NFs',brl(tv)],['Juros total',brl(tj),'neg'],['Líquido total',brl(liq),'pos'],['Taxa nominal (com float)',nf(t*100)+'% a.m.'],['Taxa final efetiva',isFinite(tef)?nf(tef*100)+'% a.m.':'—'],['Prazo médio ponderado',isFinite(pm)?nf(pm,0)+' dias':'—'],['Float',nf(fl,0)+' dia(s)']]);
  $('#x-rows').innerHTML=R.length?'<div class="lbl" style="margin-bottom:4px">Por parcela</div>'+R.map((r,i)=>`<div class="xr"><div><b>${i+1}) ${r.venc?fd(r.venc):'sem vencimento'}</b><span>NF ${esc(r.nf||'-')} · ${isFinite(r.dt)?r.pz+' + '+fl+' = '+r.dt+' dias':'—'}</span></div><div><b>${brl(r.l)}</b><span>juros ${brl(r.j)} · ${isFinite(r.tf)?nf(r.tf*100)+'%':'—'}</span></div></div>`).join(''):'';
  XS=`Operação FIDC ${nm} — ${op?fd(op):''}\nTaxa ${nf(t*100)}% a.m. · float ${fl} dia(s)\n`+R.map((r,i)=>`${i+1}) NF ${r.nf||'-'} · venc. ${r.venc?fd(r.venc):'-'} · ${isFinite(r.dt)?r.dt:'-'} dias · valor ${brl(r.v)} · juros ${brl(r.j)} · líquido ${brl(r.l)}`).join('\n')+`\nTOTAL: NFs ${brl(tv)} · juros ${brl(tj)} · líquido ${brl(liq)} · taxa final ${isFinite(tef)?nf(tef*100):'-'}% a.m.`}
 $('#x-list').addEventListener('input',e=>{const el=e.target;if(el.dataset.i==null)return;X[+el.dataset.i][el.dataset.k]=el.value;xsave();calcX()});
@@ -814,6 +814,63 @@ function gpSetup(){const p=GP.perfil;if(!p)return;const adm=p.papel==='admin';
  if(adm){$('#h-dep').hidden=false;$('#h-dep').innerHTML='<option value="">Todos os departamentos</option>'+DEPTOS.map(d=>`<option>${d}</option>`).join('')}
  const det=$('#fup')?.closest('details');if(det)det.hidden=!adm;route()}
 if(window.GP?.perfil)gpSetup();else document.addEventListener('gp-ready',gpSetup);
+/* ---- Exportar (PDF, Excel, WhatsApp, e-mail) ---- */
+const EXL={pdf:['https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js','https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js'],xlsx:['https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js']};
+const exLoaded={};
+function exLoad(urls){return urls.reduce((p,u)=>p.then(()=>exLoaded[u]||(exLoaded[u]=new Promise((ok,err)=>{const s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=()=>{delete exLoaded[u];err(new Error('load'))};document.head.appendChild(s)}))),Promise.resolve())}
+const exVis=el=>!el.closest('[hidden]');
+function exCard(){const c=$$('[data-calc]').find(d=>!d.hidden);if(!c)return null;const card=[...c.querySelectorAll('.card.res')].find(exVis);return card?{c:c.dataset.calc,card}:null}
+function exData(){const k=exCard();if(!k)return null;const {c,card}=k,blocks=[];let head='',big='',sub='',cap='';
+ let det='';try{det=resumo(c).t||''}catch(e){}
+ for(const el of card.children){if(!exVis(el))continue;
+  if(el.classList.contains('big')){big=el.textContent.trim();continue}
+  if(el.classList.contains('lbl')&&!el.querySelector('button')){const t=el.textContent.trim();if(!t)continue;if(!head)head=t;else if(!big)head=t;else if(!sub&&!blocks.length)sub=t;else cap=t;continue}
+  if(el.id==='d-pen')continue;
+  const tabs=el.tagName==='TABLE'?[el]:[...el.querySelectorAll('table')];
+  for(const t of tabs){const rows=[...t.rows].map(tr=>[...tr.cells].map(td=>td.textContent.replace(/\s+/g,' ').trim())).filter(r=>r.some(Boolean));if(!rows.length)continue;
+   const sm=el.tagName==='DETAILS'?(el.querySelector('summary')?.textContent.trim()||''):'';blocks.push({cap:sm||cap,rows,big:!!sm});cap=''}}
+ const quem=(window.GP?.perfil?.nome)||'';
+ return{c,title:CT[c]||'Cálculo',det,head,big,sub,blocks,quem,data:new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}}
+function exText(d,fmt){const B=s=>fmt==='wa'?'*'+s+'*':s;const L=[B('Garopaba Algodoeira · '+d.title),d.det,'',B(d.head+': '+d.big)];if(d.sub)L.push(d.sub);
+ d.blocks.filter(b=>!b.big).forEach(b=>{L.push('');if(b.cap)L.push(B(b.cap));b.rows.forEach(r=>L.push(r.filter(Boolean).join(': ')))});
+ if(d.blocks.some(b=>b.big))L.push('','(tabela completa no PDF ou Excel)');
+ L.push('','Calculado em '+d.data+(d.quem?' por '+d.quem:''));return L.join('\n').replace(/\n{3,}/g,'\n\n')}
+const exFile=d=>('garopaba-'+d.c+'-'+new Date().toISOString().slice(0,10)).replace(/[^a-z0-9-]/gi,'');
+const exPdfTxt=s=>String(s).replace(/−/g,'-').replace(/[–—]/g,'-').replace(/[^\x00-\xff…·•‰€]/g,'');
+async function exPdf(d){await exLoad(EXL.pdf);const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'pt',format:'a4'}),W=doc.internal.pageSize.getWidth(),T=exPdfTxt;let y=48;
+ doc.setFillColor(12,36,29);doc.rect(0,0,W,70,'F');doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text('Garopaba Algodoeira',40,32);doc.setFont('helvetica','normal');doc.setFontSize(11);doc.text(T(d.title),40,52);doc.text(T(d.data),W-40,52,{align:'right'});
+ y=96;doc.setTextColor(30,30,30);if(d.det){doc.setFontSize(10);const ls=doc.splitTextToSize(T(d.det),W-80);doc.text(ls,40,y);y+=ls.length*13+8}
+ doc.setFontSize(10);doc.setTextColor(90,107,101);doc.text(T(d.head),40,y);y+=22;doc.setFontSize(22);doc.setTextColor(15,138,108);doc.setFont('helvetica','bold');doc.text(T(d.big),40,y);doc.setFont('helvetica','normal');y+=16;
+ if(d.sub){doc.setFontSize(10);doc.setTextColor(90,107,101);const ls=doc.splitTextToSize(T(d.sub),W-80);doc.text(ls,40,y);y+=ls.length*13}y+=8;
+ for(const b of d.blocks){if(b.cap){doc.setFontSize(11);doc.setTextColor(30,30,30);doc.setFont('helvetica','bold');doc.text(T(b.cap),40,y+12);doc.setFont('helvetica','normal');y+=18}
+  const w=Math.max(...b.rows.map(r=>r.length));const body=b.rows.map(r=>{const x=r.map(T);while(x.length<w)x.push('');return x});
+  doc.autoTable({startY:y,body,margin:{left:40,right:40},theme:'grid',styles:{fontSize:9,cellPadding:4,textColor:[30,30,30],lineColor:[225,228,220]},columnStyles:w===2?{1:{halign:'right',cellWidth:150}}:{},didParseCell:h=>{const v=String(h.cell.raw||'');if(/^-\s?R\$/.test(v)||/^- /.test(v))h.cell.styles.textColor=[200,68,42];if(/^(Líquido|Total|Salário líquido|Valor líquido)/i.test(String(h.row.raw?.[0]||'')))h.cell.styles.fontStyle='bold'}});y=doc.lastAutoTable.finalY+14;if(y>760){doc.addPage();y=48}}
+ doc.setFontSize(8);doc.setTextColor(140,140,140);doc.text(T('Calculado em '+d.data+(d.quem?' por '+d.quem:'')+' · valores informativos, confira antes de usar.'),40,doc.internal.pageSize.getHeight()-24);
+ doc.save(exFile(d)+'.pdf')}
+const exNum=v=>{const m=String(v).trim().match(/^([−+-])?\s*R\$\s*(-?[\d.]+,\d+)$/);if(!m)return null;const n=num(m[2]);return isFinite(n)?(m[1]==='−'||m[1]==='-'?-n:n):null};
+async function exXlsx(d){await exLoad(EXL.xlsx);const X=window.XLSX,A=[['Garopaba Algodoeira · '+d.title],[d.det],['Calculado em',d.data+(d.quem?' por '+d.quem:'')],[],[d.head,d.big]];if(d.sub)A.push([d.sub]);
+ d.blocks.forEach(b=>{A.push([]);if(b.cap)A.push([b.cap]);b.rows.forEach(r=>A.push(r))});
+ const ws=X.utils.aoa_to_sheet(A.map(r=>r.map(v=>{const n=exNum(v);return n==null?v:n})));
+ Object.keys(ws).forEach(k=>{if(k[0]!=='!'&&ws[k].t==='n')ws[k].z='"R$" #,##0.00;[Red]-"R$" #,##0.00'});
+ ws['!cols']=[{wch:48},{wch:20},{wch:16},{wch:16},{wch:16},{wch:16}];const wb=X.utils.book_new();X.utils.book_append_sheet(wb,ws,'Cálculo');X.writeFile(wb,exFile(d)+'.xlsx')}
+function exPhone(v){let n=String(v||'').replace(/\D/g,'');if(n.startsWith('00'))n=n.slice(2);if(n.length===10||n.length===11)n='55'+n;return n.length>=12&&n.length<=13?n:''}
+function exOpen(){const d=exData();if(!d){return}let dlg=$('#exdlg');
+ if(!dlg){dlg=document.createElement('dialog');dlg.id='exdlg';dlg.innerHTML=`<form method="dialog" class="exb"><div class="exh"><h3>Exportar cálculo</h3><button value="x" class="exx" aria-label="Fechar">✕</button></div>
+<p class="mut" id="ex-t" style="margin:0 0 12px"></p>
+<div class="mini exg"><button type="button" class="pri" id="ex-pdf">Baixar PDF</button><button type="button" class="pri" id="ex-xls">Baixar Excel</button></div>
+<label for="ex-wa">WhatsApp (DDD + número)</label><div class="exr"><input id="ex-wa" inputmode="tel" autocomplete="tel" placeholder="(11) 91234-5678"><button type="button" id="ex-wab">Enviar</button></div>
+<label for="ex-em">E-mail</label><div class="exr"><input id="ex-em" type="email" inputmode="email" autocomplete="email" placeholder="nome@empresa.com.br"><button type="button" id="ex-emb">Abrir e-mail</button></div>
+<p class="lbl" id="ex-m" style="min-height:18px;margin:10px 0 0"></p></form>`;document.body.appendChild(dlg);
+  const st=document.createElement('style');st.textContent=`#exdlg{border:1px solid var(--line);border-radius:18px;background:var(--card);color:var(--ink);padding:0;width:min(440px,calc(100vw - 24px))}#exdlg::backdrop{background:#0008}#exdlg .exb{padding:18px}#exdlg .exh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}#exdlg h3{margin:0;font-size:18px}#exdlg .exx{min-height:36px;width:36px;padding:0}#exdlg label{display:block;font-size:13px;margin:12px 0 4px;color:var(--mut)}#exdlg .exr{display:flex;gap:8px}#exdlg .exr input{flex:1;min-width:0}#exdlg .exr button{white-space:nowrap}#exdlg .exg button{min-height:44px;font-size:14px}`;document.head.appendChild(st);
+  const msg=t=>{$('#ex-m').textContent=t};
+  const run=async(fn,lbl)=>{const d=exData();if(!d)return;msg('Gerando '+lbl+'…');try{await fn(d);msg(lbl+' baixado.')}catch(e){msg('Não foi possível gerar o '+lbl+'. Verifique a internet e tente de novo.')}};
+  $('#ex-pdf').onclick=()=>run(exPdf,'PDF');$('#ex-xls').onclick=()=>run(exXlsx,'Excel');
+  $('#ex-wab').onclick=()=>{const n=exPhone($('#ex-wa').value);if(!n){msg('Digite o número com DDD, por exemplo (11) 91234-5678.');return}try{localStorage.setItem('ex_wa',$('#ex-wa').value)}catch(e){}window.open('https://wa.me/'+n+'?text='+encodeURIComponent(exText(exData(),'wa')),'_blank');msg('Abrindo o WhatsApp…')};
+  $('#ex-emb').onclick=()=>{const e=$('#ex-em').value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){msg('Digite um e-mail válido.');return}try{localStorage.setItem('ex_em',e)}catch(_){}const d=exData();location.href='mailto:'+encodeURIComponent(e).replace('%40','@')+'?subject='+encodeURIComponent('Garopaba Algodoeira · '+d.title)+'&body='+encodeURIComponent(exText(d,'em'));msg('Abrindo o e-mail…')}}
+ try{$('#ex-wa').value=$('#ex-wa').value||localStorage.getItem('ex_wa')||'';$('#ex-em').value=$('#ex-em').value||localStorage.getItem('ex_em')||''}catch(e){}
+ $('#ex-t').textContent=d.title+' · '+d.head+': '+d.big;$('#ex-m').textContent='';if(dlg.showModal)dlg.showModal();else dlg.setAttribute('open','')}
+$$('[data-calc] .card.res').forEach(card=>{let mn=[...card.children].reverse().find(el=>el.classList.contains('mini'));if(!mn){mn=document.createElement('div');mn.className='mini';mn.style.marginTop='14px';card.appendChild(mn)}
+ const b=document.createElement('button');b.type='button';b.className='pri';b.textContent='Exportar';b.addEventListener('click',exOpen);mn.insertBefore(b,mn.firstChild)});
 
 }
 </script>
