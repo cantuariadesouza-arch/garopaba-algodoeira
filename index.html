@@ -28,7 +28,10 @@ h1,h2,h3,.num{font-family:Sora,Inter,sans-serif}
 h2{font-size:24px;line-height:1.15;margin:0 0 4px;text-wrap:balance}
 .wrap{max-width:1240px;margin:0 auto;padding:0 max(4vw,16px)}
 .band{padding-block:clamp(22px,4vw,48px)}
-header.top{background:var(--field);color:#eef4ef;padding:14px 0 0}
+header.top{background:var(--field);color:#eef4ef;padding:14px 0 0;position:sticky;top:0;z-index:40;box-shadow:0 6px 18px -12px #000a}
+#gref{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:0 12px;font-size:14px;font-weight:600;background:#19c3a3;border:1px solid #19c3a3;color:#04221b;border-radius:999px;white-space:nowrap;cursor:pointer;flex:none}
+#gref svg{transition:transform .2s}#gref.spin svg{animation:gspin .8s linear infinite}@keyframes gspin{to{transform:rotate(360deg)}}
+#gref[disabled]{opacity:.75}#gref{margin-left:auto}#gref+.who{margin-left:8px}@media(max-width:520px){#gref .t{display:none}#gref{padding:0 11px}}
 .brand{display:flex;align-items:center;gap:10px;font:600 16px Sora,sans-serif;letter-spacing:.2px}
 .brand small{font:400 13px Inter;color:#9fb8ae;margin-left:auto}
 .rf{min-height:38px;padding:0 14px;font-size:14px;font-weight:600;background:#19c3a3;border-color:#19c3a3;color:#04221b;margin-left:12px;white-space:nowrap}.rf[disabled]{opacity:.6;cursor:wait}
@@ -173,7 +176,7 @@ window.DEPTOS=['Comercial','Financeiro','Contábil','Faturamento','Logística','
 (function(){
 const C=window.GAROPABA_CONFIG||{},g=id=>document.getElementById(id);
 let ready,readyRes;ready=new Promise(r=>readyRes=r);
-window.GP={sb:null,user:null,perfil:null,ready};
+window.GP={sb:null,user:null,perfil:null,ready,rl:new Set()};
 g('gc-d').innerHTML+=DEPTOS.map(d=>`<option>${d}</option>`).join('');g('gp-d').innerHTML+=DEPTOS.map(d=>`<option>${d}</option>`).join('');
 const show=id=>['g-load','g-login','g-cad','g-comp','g-wait','g-cfg'].forEach(x=>g(x).hidden=x!==id);
 document.querySelectorAll('#gate [data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go==='cad'?'g-cad':'g-login'));
@@ -205,13 +208,13 @@ const docRef=path=>({
  onSnapshot(next,err){let alive=true;const load=async()=>{const [{data,error},fd]=await Promise.all([sb.from('docs').select('data').eq('path',path).maybeSingle(),feedGet(path)]);if(!alive)return;
   let v=data?.data||null;if(fd&&(!v||path!=='mercado/atual'||feedTs(fd)>=feedTs(v)))v=fd;
   if(!v&&error){err&&err(error);return}next({exists:!!v,data:()=>v,metadata:{fromCache:false}})};
-  load();const ch=sb.channel('d-'+path+'-'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'docs',filter:'path=eq.'+path},load).subscribe();const t=setInterval(load,120000);
-  return()=>{alive=false;clearInterval(t);sb.removeChannel(ch)}},
+  GP.rl.add(load);load();const ch=sb.channel('d-'+path+'-'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'docs',filter:'path=eq.'+path},load).subscribe();const t=setInterval(load,120000);
+  return()=>{alive=false;GP.rl.delete(load);clearInterval(t);sb.removeChannel(ch)}},
  async set(d){const {error}=await sb.from('docs').upsert({path,data:d,atualizado_em:new Date().toISOString()});if(error)throw{code:'invalid_argument',message:error.message}}});
 const fromRow=r=>({tipo:r.tipo,em:r.criado_em,ref:r.ref,titulo:r.titulo,res:r.res,sub:r.sub,inputs:r.inputs,por:r.criado_por,fidc:r.fidc,bruto:r.bruto==null?null:Number(r.bruto),nfs:r.nfs,depto:r.departamento});
 const histCol=(lim=1000)=>({orderBy(){return this},limit(n){lim=n;return this},
  onSnapshot(next,err){let alive=true;const load=async()=>{const {data,error}=await sb.from('historico').select('*').order('criado_em',{ascending:false}).limit(lim);if(!alive)return;if(error){err&&err(error);return}next({docs:data.map(r=>({id:r.id,data:()=>fromRow(r)}))})};
-  load();GP.reloadHist=load;const ch=sb.channel('h-'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'historico'},load).subscribe();
+  GP.rl.add(load);load();GP.reloadHist=load;const ch=sb.channel('h-'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'historico'},load).subscribe();
   return()=>{alive=false;sb.removeChannel(ch)}},
  async add(d){const row={tipo:d.tipo,ref:d.ref||null,titulo:d.titulo,res:d.res,sub:d.sub,inputs:d.inputs,fidc:d.fidc??null,bruto:d.bruto??null,nfs:d.nfs??null};const {error}=await sb.from('historico').insert(row);if(error)throw{code:'permission_denied',message:error.message};GP.reloadHist&&GP.reloadHist()},
  doc(id){return{async delete(){const {error}=await sb.from('historico').delete().eq('id',id);if(error)throw error;GP.reloadHist&&GP.reloadHist()}}}});
@@ -226,7 +229,7 @@ if(!window.claude)window.claude={use:async()=>null};
 <header class="top"><div class="wrap brand">
 <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 47c0 4-.6 7.5-2 11" stroke="#19c3a3" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M30.6 53.5c-3.6-3.4-8-3.6-11.2-1.6 3.4 3.6 7.6 3.8 11.2 1.6z" fill="#19c3a3"/><path d="M33 50.5c2.8-3.2 6.8-3.8 9.8-2.2-2.8 3.4-6.6 4-9.8 2.2z" fill="#14a88c"/><path d="M17 38c-4.5-3-6.8-8-6.6-13.6 4.2 2.4 7.6 6 9.6 10.6z" fill="#8a5d36"/><path d="M47 38c4.5-3 6.8-8 6.6-13.6-4.2 2.4-7.6 6-9.6 10.6z" fill="#8a5d36"/><path d="M12.5 37.5l7 1.2-2.6-6.6 7.6 4.4L32 28.6l7.5 7.9 7.6-4.4-2.6 6.6 7-1.2c-3.4 7.6-11 11.8-19.5 11.8s-16.1-4.2-19.5-11.8z" fill="#7a5230"/><path d="M17 41.5c4 3.8 9.2 5.6 15 5.6s11-1.8 15-5.6c-4.6 5.6-9.6 7.4-15 7.4s-10.4-1.8-15-7.4z" fill="#5c3c22"/><circle cx="21.5" cy="29" r="9" fill="#e6eee9"/><circle cx="42.5" cy="29" r="9" fill="#e6eee9"/><circle cx="32" cy="22" r="10.5" fill="#f4f8f5"/><circle cx="26" cy="35" r="8.2" fill="#fff"/><circle cx="38" cy="35" r="8.2" fill="#fff"/><circle cx="32" cy="31" r="8" fill="#fff"/><path d="M27.5 16.8c2.4-2 6.6-2.4 9.4-.4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".9"/><path d="M32 39.5c-1.6-2.2-1.6-5.6 0-8M24.2 30.6c-1.6.6-2.6 2-2.9 3.6M39.8 30.6c1.6.6 2.6 2 2.9 3.6" stroke="#c9d7cf" stroke-width="1.2" fill="none" stroke-linecap="round"/>
 </svg>
-Garopaba Algodoeira<small id="upd">Carregando dados…</small><button type="button" id="rf" class="rf" hidden>↻ Atualizar</button><div class="who" id="who" hidden><span id="who-t"></span><button type="button" id="who-o">Sair</button></div></div><div class="wrap nota" id="nota" hidden></div><div class="wrap nota" id="rfm" role="status" hidden></div><div style="height:12px"></div></header>
+Garopaba Algodoeira<small id="upd">Carregando dados…</small><button type="button" id="rf" class="rf" hidden>↻ Atualizar</button><button type="button" id="gref" title="Atualizar tudo" aria-label="Atualizar tudo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span class="t">Atualizar</span></button><div class="who" id="who" hidden><span id="who-t"></span><button type="button" id="who-o">Sair</button></div></div><div class="wrap nota" id="nota" hidden></div><div class="wrap nota" id="rfm" role="status" hidden></div><div style="height:12px"></div></header>
 
 <section class="view" id="v-mercado">
 <div class="hero"><div class="wrap band hgrid">
@@ -819,6 +822,12 @@ function gpSetup(){const p=GP.perfil;if(!p)return;const adm=p.papel==='admin';
  if(adm){$('#h-dep').hidden=false;$('#h-dep').innerHTML='<option value="">Todos os departamentos</option>'+DEPTOS.map(d=>`<option>${d}</option>`).join('')}
  const det=$('#fup')?.closest('details');if(det)det.hidden=!adm;route()}
 if(window.GP?.perfil)gpSetup();else document.addEventListener('gp-ready',gpSetup);
+/* ---- Botão Atualizar (fixo no topo) ---- */
+async function gRefresh(manual){const b=$('#gref'),rl=[...(window.GP?.rl||[])];if(!rl.length||b.disabled)return;b.disabled=true;b.classList.add('spin');const t0=Date.now();
+ try{await Promise.all(rl.map(f=>Promise.resolve(f()).catch(()=>{})))}finally{setTimeout(()=>{b.disabled=false;b.classList.remove('spin')},Math.max(0,700-(Date.now()-t0)))}
+ if(manual){const m=$('#rfm');m.hidden=false;m.textContent='Dados atualizados às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.';clearTimeout(gRefresh.tm);gRefresh.tm=setTimeout(()=>{m.hidden=true},3500)}}
+$('#gref').addEventListener('click',()=>gRefresh(true));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')gRefresh(false)});
 /* ---- Exportar (PDF, Excel, WhatsApp, e-mail) ---- */
 const EXL={pdf:['https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js','https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js'],xlsx:['https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js']};
 const exLoaded={};
