@@ -1,5 +1,5 @@
 {
-  "atualizado": "27/11/2026 17:42",
+  "atualizado": "27/11/2026 19:30",
   "esalq": [
     {
       "d": "2026-11-03",
@@ -156,14 +156,18 @@
     {
       "d": "2026-11-26",
       "v": 6.3022
+    },
+    {
+      "d": "2026-11-27",
+      "v": 6.0315
     }
   ],
   "fonte": {
     "esalq": "CEPEA/ESALQ 8 dias",
-    "eur": "Comercial (intradia)",
+    "eur": "PTAX BCB",
     "eurCom": "Comercial (fechamento)",
     "ice": "ICE NY Mar/27",
-    "usd": "Comercial (intradia)",
+    "usd": "PTAX BCB",
     "usdCom": "Comercial (fechamento)",
     "usdFut": "Futuro B3 WDO Dez/26"
   },
@@ -195,6 +199,10 @@
     {
       "d": "2026-11-26",
       "v": 176799.84
+    },
+    {
+      "d": "2026-11-27",
+      "v": 176573.35
     }
   ],
   "ice": [
@@ -255,9 +263,13 @@
     {
       "d": "2026-11-25",
       "v": 23585.8
+    },
+    {
+      "d": "2026-11-27",
+      "v": 24129.5
     }
   ],
-  "nota": "Dólar no fechamento de hoje; euro pela PTAX de hoje (fechamento comercial ainda não confirmado).",
+  "nota": "ESALQ de 27/11 ainda não divulgado; nova tentativa amanhã às 7h",
   "selic": 13.75,
   "selicData": "2026-11-04",
   "sp500": [
@@ -288,6 +300,10 @@
     {
       "d": "2026-11-25",
       "v": 7182.78
+    },
+    {
+      "d": "2026-11-27",
+      "v": 7297.49
     }
   ],
   "usd": [
@@ -317,7 +333,7 @@
     },
     {
       "d": "2026-11-27",
-      "v": 5.514
+      "v": 5.543
     }
   ],
   "usdCom": [
@@ -340,13 +356,21 @@
     {
       "d": "2026-11-26",
       "v": 5.7464
+    },
+    {
+      "d": "2026-11-27",
+      "v": 5.5156
     }
   ],
   "usdFut": [
     {
       "d": "2026-11-26",
       "v": 5.7485
+    },
+    {
+      "d": "2026-11-27",
+      "v": 5.576
     }
   ],
-  "verificado": "27/11 18:45"
+  "verificado": "27/11 19:30"
 }

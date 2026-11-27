@@ -3,10 +3,18 @@
     {
       "c": "Câmbio",
       "d": "2026-11-27",
-      "f": "O Tempo",
-      "r": "Moeda americana recuava 4,23%, a R$ 5,499, por volta das 10h15, e chegou à mínima de R$ 5,478 após confirmação de Trabuco.",
-      "t": "Dólar despenca mais de 4% e toca R$ 5,48 com Trabuco na Fazenda",
-      "u": "https://www.otempo.com.br/economia/2026/11/27/efeito-trabuco-dolar-cai-mais-de-4-no-dia-e-chega-a-r-5-48-bolsa-dispara-mais-uma-vez"
+      "f": "BPMoney",
+      "r": "Moeda americana recuou 3,97% no dia e acumulou queda de cerca de 7% na semana, após confirmação de Trabuco no ministério.",
+      "t": "Dólar cai quase 4% e fecha a R$ 5,5156 com Trabuco na Fazenda",
+      "u": "https://bpmoney.com.br/mercado/cambio/dolar-cai-55156-efeito-trabuco-fazenda-queda-semana/"
+    },
+    {
+      "c": "Economia",
+      "d": "2026-11-27",
+      "f": "Times Brasil",
+      "r": "Índice chegou a 183,6 mil pontos pela manhã, mas encerrou a sexta em 176.573 pontos, queda de 0,13%.",
+      "t": "Ibovespa devolve ganhos e fecha em leve baixa, mas sobe 6,13% na semana",
+      "u": "https://timesbrasil.com.br/investimentos/bolsa/ibovespa-cai-013-apos-disparar-no-inicio-do-pregao-com-trabuco-indice-fecha-semana-com-alta-de-613/"
     },
     {
       "c": "Algodão",
@@ -41,6 +49,14 @@
       "u": "https://nx1.com.br/2026/11/27/slc-agricola-estreia-exportacao-de-algodao-da-fazenda-parnagua-com-117-toneladas-para-a-turquia/"
     },
     {
+      "c": "Câmbio",
+      "d": "2026-11-27",
+      "f": "Investing.com / Reuters",
+      "r": "No início do pregão, o dólar à vista caía 3,70%, a R$ 5,5336, e o contrato futuro de dezembro recuava 2,12%.",
+      "t": "Dólar desaba na abertura após Trabuco aceitar comandar a Fazenda",
+      "u": "https://br.investing.com/news/forex-news/dolar-despenca-apos-trabuco-aceitar-comando-do-ministerio-da-fazenda-2139183"
+    },
+    {
       "c": "Economia",
       "d": "2026-11-27",
       "f": "InfoMoney",
@@ -49,28 +65,12 @@
       "u": "https://www.infomoney.com.br/mercados/trabuco-fazenda-desemprego-igp-m-agenda-27112026/"
     },
     {
-      "c": "Economia",
-      "d": "2026-11-26",
-      "f": "BPMoney",
-      "r": "Bolsa teve forte alta e dólar recuou 1,25% diante da expectativa de Luiz Carlos Trabuco no Ministério da Fazenda.",
-      "t": "Ibovespa sobe 6,07% e fecha a 176.799 pontos com Trabuco no radar",
-      "u": "https://bpmoney.com.br/mercado/ibovespa-dispara-607-dolar-cai-574-expectativa-trabuco-fazenda/"
-    },
-    {
       "c": "Algodão",
       "d": "2026-11-26",
       "f": "Aquidauana Notícias / Cepea",
       "r": "Indicador Cepea/Esalq chegou a R$ 4,2797/lp em 25/11, alta de 3,62% no mês; à vista, R$ 4,2675/lp.",
       "t": "Pluma segue firme no Brasil, apoiada no dólar e nas exportações",
       "u": "https://aquidauananoticias.com.br/?p=27845"
-    },
-    {
-      "c": "Economia",
-      "d": "2026-11-26",
-      "f": "Money Times",
-      "r": "IPCA-15 veio abaixo do esperado; no acumulado de 12 meses, o índice sobe 4,64%.",
-      "t": "Prévia da inflação desacelera para 0,22% em novembro",
-      "u": "https://www.moneytimes.com.br/ipca-15-desacelera-em-novembro-mas-sobe-464-em-12-meses/"
     },
     {
       "c": "Economia",
