@@ -855,7 +855,7 @@ function exText(d,fmt){const B=s=>fmt==='wa'?'*'+s+'*':s;const L=[B('Garopaba Al
  L.push('','Calculado em '+d.data+(d.quem?' por '+d.quem:''));return L.join('\n').replace(/\n{3,}/g,'\n\n')}
 const exFile=d=>('garopaba-'+d.c+'-'+new Date().toISOString().slice(0,10)).replace(/[^a-z0-9-]/gi,'');
 const exPdfTxt=s=>String(s).replace(/−/g,'-').replace(/[–—]/g,'-').replace(/[^\x00-\xff…·•‰€]/g,'');
-async function exPdf(d){await exLoad(EXL.pdf);const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'pt',format:'a4'}),W=doc.internal.pageSize.getWidth(),T=exPdfTxt;let y=48;
+async function exPdf(d,asBlob){await exLoad(EXL.pdf);const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'pt',format:'a4'}),W=doc.internal.pageSize.getWidth(),T=exPdfTxt;let y=48;
  doc.setFillColor(12,36,29);doc.rect(0,0,W,70,'F');doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text('Garopaba Algodoeira',40,32);doc.setFont('helvetica','normal');doc.setFontSize(11);doc.text(T(d.title),40,52);doc.text(T(d.data),W-40,52,{align:'right'});
  y=96;doc.setTextColor(30,30,30);if(d.det){doc.setFontSize(10);const ls=doc.splitTextToSize(T(d.det),W-80);doc.text(ls,40,y);y+=ls.length*13+8}
  doc.setFontSize(10);doc.setTextColor(90,107,101);doc.text(T(d.head),40,y);y+=22;doc.setFontSize(22);doc.setTextColor(15,138,108);doc.setFont('helvetica','bold');doc.text(T(d.big),40,y);doc.setFont('helvetica','normal');y+=16;
@@ -864,7 +864,7 @@ async function exPdf(d){await exLoad(EXL.pdf);const {jsPDF}=window.jspdf,doc=new
   const w=Math.max(...b.rows.map(r=>r.length));const body=b.rows.map(r=>{const x=r.map(T);while(x.length<w)x.push('');return x});
   doc.autoTable({startY:y,body,margin:{left:40,right:40},theme:'grid',styles:{fontSize:9,cellPadding:4,textColor:[30,30,30],lineColor:[225,228,220]},columnStyles:w===2?{1:{halign:'right',cellWidth:150}}:{},didParseCell:h=>{const v=String(h.cell.raw||'');if(/^-\s?R\$/.test(v)||/^- /.test(v))h.cell.styles.textColor=[200,68,42];if(/^(Líquido|Total|Salário líquido|Valor líquido)/i.test(String(h.row.raw?.[0]||'')))h.cell.styles.fontStyle='bold'}});y=doc.lastAutoTable.finalY+14;if(y>760){doc.addPage();y=48}}
  doc.setFontSize(8);doc.setTextColor(140,140,140);doc.text(T('Calculado em '+d.data+(d.quem?' por '+d.quem:'')+' · valores informativos, confira antes de usar.'),40,doc.internal.pageSize.getHeight()-24);
- doc.save(exFile(d)+'.pdf')}
+ if(asBlob)return doc.output('blob');doc.save(exFile(d)+'.pdf')}
 const exNum=v=>{const m=String(v).trim().match(/^([−+-])?\s*R\$\s*(-?[\d.]+,\d+)$/);if(!m)return null;const n=num(m[2]);return isFinite(n)?(m[1]==='−'||m[1]==='-'?-n:n):null};
 async function exXlsx(d){await exLoad(EXL.xlsx);const X=window.XLSX,A=[['Garopaba Algodoeira · '+d.title],[d.det],['Calculado em',d.data+(d.quem?' por '+d.quem:'')],[],[d.head,d.big]];if(d.sub)A.push([d.sub]);
  d.blocks.forEach(b=>{A.push([]);if(b.cap)A.push([b.cap]);b.rows.forEach(r=>A.push(r))});
@@ -877,7 +877,7 @@ function exOpen(){const d=exData();if(!d){return}let dlg=$('#exdlg');
 <p class="mut" id="ex-t" style="margin:0 0 12px"></p>
 <div class="mini exg"><button type="button" class="pri" id="ex-pdf">Baixar PDF</button><button type="button" class="pri" id="ex-xls">Baixar Excel</button></div>
 <label for="ex-wa">WhatsApp (DDD + número)</label><div class="exr"><input id="ex-wa" inputmode="tel" autocomplete="tel" placeholder="(11) 91234-5678"><button type="button" id="ex-wab">Enviar</button></div>
-<label for="ex-em">E-mail</label><div class="exr"><input id="ex-em" type="email" inputmode="email" autocomplete="email" placeholder="nome@empresa.com.br"><button type="button" id="ex-emb">Abrir UOL Host</button></div><p class="mut" style="font-size:12px;margin:6px 0 0">Abre o webmail do UOL Host numa nova guia e copia o texto do cálculo. Lá, toque em <b>Escrever</b>, coloque o destinatário e cole o texto. Para mandar o PDF, baixe antes e anexe. <a href="#" id="ex-mailto">Usar outro programa de e-mail</a></p>
+<label for="ex-em">E-mail</label><div class="exr"><input id="ex-em" type="email" inputmode="email" autocomplete="email" placeholder="nome@empresa.com.br"><button type="button" id="ex-emb">Abrir no Outlook</button></div><p class="mut" style="font-size:12px;margin:6px 0 0">Baixa um e-mail pronto, já com o PDF anexado. Abra o arquivo baixado: ele abre no <b>Outlook clássico</b>, é só conferir e clicar em Enviar. Se abrir em outro programa, clique com o botão direito no arquivo › Abrir com › Outlook. <a href="#" id="ex-mailto">Usar o programa de e-mail padrão</a></p>
 <p class="lbl" id="ex-m" style="min-height:18px;margin:10px 0 0"></p></form>`;document.body.appendChild(dlg);
   const st=document.createElement('style');st.textContent=`#exdlg{border:1px solid var(--line);border-radius:18px;background:var(--card);color:var(--ink);padding:0;width:min(440px,calc(100vw - 24px))}#exdlg::backdrop{background:#0008}#exdlg .exb{padding:18px}#exdlg .exh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}#exdlg h3{margin:0;font-size:18px}#exdlg .exx{min-height:36px;width:36px;padding:0}#exdlg label{display:block;font-size:13px;margin:12px 0 4px;color:var(--mut)}#exdlg .exr{display:flex;gap:8px}#exdlg .exr input{flex:1;min-width:0}#exdlg .exr button{white-space:nowrap}#exdlg .exg button{min-height:44px;font-size:14px}`;document.head.appendChild(st);
   const msg=t=>{$('#ex-m').textContent=t};
@@ -886,8 +886,18 @@ function exOpen(){const d=exData();if(!d){return}let dlg=$('#exdlg');
   $('#ex-wab').onclick=()=>{const n=exPhone($('#ex-wa').value);if(!n){msg('Digite o número com DDD, por exemplo (11) 91234-5678.');return}try{localStorage.setItem('ex_wa',$('#ex-wa').value)}catch(e){}window.open('https://wa.me/'+n+'?text='+encodeURIComponent(exText(exData(),'wa')),'_blank');msg('Abrindo o WhatsApp…')};
   const exEm=()=>{const e=$('#ex-em').value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){msg('Digite um e-mail válido.');return null}try{localStorage.setItem('ex_em',e)}catch(_){}return e};
   const exCopy=async t=>{try{await navigator.clipboard.writeText(t);return true}catch(_){try{const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();const ok=document.execCommand('copy');a.remove();return ok}catch(__){return false}}};
-  $('#ex-emb').onclick=async()=>{const e=exEm();if(!e)return;const d=exData(),sub='Garopaba Algodoeira · '+d.title,body=exText(d,'em');const w=window.open('https://email.uolhost.com.br/','_blank');
-   const ok=await exCopy(body);msg((w?'UOL Host aberto numa nova guia. ':'Libere a abertura de nova guia e toque de novo. ')+(ok?'Texto copiado: em Escrever, coloque '+e+', assunto "'+sub+'" e cole o texto.':'Não consegui copiar o texto sozinho; use o PDF ou o Excel.'))};
+  const b64u=t=>{const u=new TextEncoder().encode(t);let r='';for(let i=0;i<u.length;i+=0x8000)r+=String.fromCharCode(...u.subarray(i,i+0x8000));return btoa(r)};
+  const wrap=x=>x.replace(/.{1,76}/g,'$&\r\n');
+  const blob64=bl=>new Promise((ok,er)=>{const f=new FileReader();f.onload=()=>ok(String(f.result).split(',')[1]);f.onerror=er;f.readAsDataURL(bl)});
+  const MOB=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  $('#ex-emb').onclick=async()=>{const e=exEm();if(!e)return;const d=exData(),sub='Garopaba Algodoeira · '+d.title,body=exText(d,'em')+'\n\n(PDF do cálculo em anexo)';
+   if(MOB){location.href='mailto:'+encodeURIComponent(e).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(exText(d,'em'));msg('Abrindo o e-mail do celular…');return}
+   msg('Preparando o e-mail com o PDF…');let pdf=null;try{pdf=await exPdf(d,true)}catch(_){}
+   const B='----=_Garopaba_'+Date.now(),fn=exFile(d)+'.pdf';
+   let m='To: '+e+'\r\nSubject: =?UTF-8?B?'+b64u(sub)+'?=\r\nX-Unsent: 1\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary="'+B+'"\r\n\r\n--'+B+'\r\nContent-Type: text/plain; charset="utf-8"\r\nContent-Transfer-Encoding: base64\r\n\r\n'+wrap(b64u(body));
+   if(pdf)m+='--'+B+'\r\nContent-Type: application/pdf; name="'+fn+'"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename="'+fn+'"\r\n\r\n'+wrap(await blob64(pdf));
+   m+='--'+B+'--\r\n';const url=URL.createObjectURL(new Blob([m],{type:'message/rfc822'})),ae=document.createElement('a');ae.href=url;ae.download=exFile(d)+'.eml';document.body.appendChild(ae);ae.click();ae.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+   msg('E-mail baixado'+(pdf?' com o PDF anexado':'')+'. Abra o arquivo '+exFile(d)+'.eml: ele abre no Outlook pronto para enviar a '+e+'.')};
   $('#ex-mailto').onclick=ev=>{ev.preventDefault();const e=exEm();if(!e)return;const d=exData();location.href='mailto:'+encodeURIComponent(e).replace('%40','@')+'?subject='+encodeURIComponent('Garopaba Algodoeira · '+d.title)+'&body='+encodeURIComponent(exText(d,'em'));msg('Abrindo o programa de e-mail…')}}
  try{$('#ex-wa').value=$('#ex-wa').value||localStorage.getItem('ex_wa')||'';$('#ex-em').value=$('#ex-em').value||localStorage.getItem('ex_em')||''}catch(e){}
  $('#ex-t').textContent=d.title+' · '+d.head+': '+d.big;$('#ex-m').textContent='';if(dlg.showModal)dlg.showModal();else dlg.setAttribute('open','')}
